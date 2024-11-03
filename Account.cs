@@ -7,16 +7,11 @@ public class Account
 
     public void CreateTransactions()
     {
-        
 
-
+        Console.Clear();
        System.Console.WriteLine("Enter transaction type: press 'd' for Deposition and 'w' for Withdraw ");
      string transactionInput = Console.ReadLine()!;
-    //  if(transactionInput != "deposition" || transactionInput != "withdraw")
-    //  {
-    //     System.Console.WriteLine("Invalid transaction type, please enter 'deposition' or 'withdraw'");
-    //  }
-
+     
          System.Console.WriteLine("Enter amount: ");
      decimal amount;
   
@@ -79,10 +74,12 @@ public class Account
         }
 
         
-        System.Console.WriteLine("Press key to go back to menu");
         Console.ReadKey();
 
     }
+
+
+
     public void RemoveTransactions()
     {
         System.Console.WriteLine("Transaction deleted");
@@ -90,18 +87,23 @@ public class Account
      {
         transactions.Remove(transactions[i]);
 
-     }
-      
+     }     
         
     }
+
+
+
     public void CheckBalance()
     {
-        System.Console.WriteLine("\n Balance: "+ balance);
+        System.Console.WriteLine("\n Current balance: " + balance);
         System.Console.WriteLine("\n press key to continiue..");
         Console.ReadKey();
     }
+
+
     private void Deposition(decimal amount)
     {
+        Console.Clear();
         balance += amount;
         System.Console.WriteLine($" Deposition amount: {amount} \n New balance: {balance}");
         System.Console.WriteLine("\n Press key to continue...");
@@ -111,6 +113,7 @@ public class Account
 
     private void Withdraw(decimal amount)
     {
+        Console.Clear();
         if(amount > balance)
         {
             System.Console.WriteLine("Insufficient funds");
@@ -120,71 +123,82 @@ public class Account
         else 
        {
          balance -= amount;
-      System.Console.WriteLine($" Amount retreived: {amount} \n New balance: {balance}");
+      System.Console.WriteLine($"> Amount retreived: {amount} \n New balance: {balance}");
        System.Console.WriteLine("\n Press key to continue...");
         Console.ReadKey();
       }
     }
-    public void YearOfTransactions()
+
+
+    public void Income()
     {
-        System.Console.WriteLine("Enter the year: ");
-        string Input = Console.ReadLine()!;
-        IEnumerable<Transactions>timeline = transactions
-        .Where((transaction) => transaction.Date.Year.ToString().Equals(Input));
-        foreach(Transactions transaction in timeline)
-        {
-            System.Console.WriteLine(transaction);
-
-        }
-Console.ReadKey();
-    
-    }
-    public void IncomeStats()
+         Income income = new Income(transactions);
+    try
     {
-        decimal YearlyIncome = 0;
-
-        System.Console.Write("Enter the year you want to view your income stats: ");
-        int input = int.Parse(Console.ReadLine()!);
-       foreach(Transactions transaction in transactions)
-       {
-        if(transaction.TransactionType == "d" && transaction.Date.Year.Equals(input))
-        {       
-            System.Console.WriteLine("> Amount received: " + transaction.Amount + " | date: " + transaction.Date);
-        }
-       }
-       foreach(Transactions transaction in transactions)
-       {
-        if(transaction.TransactionType == "d" && transaction.Date.Year.Equals(input))
+        while (true)
         {
-                    YearlyIncome += transaction.Amount;
-        }
-       }
-       System.Console.WriteLine($"In {input} your net income was: {YearlyIncome}");
-       Console.ReadLine();
+    Console.WriteLine("Type one of the alternatives below to view income stats :\n 'year' 'month' 'week' 'day' 'menu' ");
+    string myChoice = Console.ReadLine()!.ToLower();
 
+    switch(myChoice)
+    {
+        case "year": income.YearIncome();
+        break;
+        case "month": income.MonthlyIncome();
+        break;
+        case "week": income.WeekIncome();
+        break;
+        case "day": income.DailyIncome();
+        break;
+        
+        case "menu": System.Console.WriteLine("Back to the menu.");
+        return;
+    }
+
+           
+
+            
+        }
+    }
+    catch
+    {
+        throw new ArgumentException("Invalid input");
+    }
+   
 
     }
+
+
     public void SpendingStats()
     {
-        decimal YearlySpending = 0;
+        Expenditure expenditure = new Expenditure(transactions);
 
-        System.Console.Write("Enter the year you want to view your spendings stats: ");
-        int yearInput = int.Parse(Console.ReadLine()!);
-        foreach(Transactions transaction in transactions)
+        try
         {
-            if(transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
+            while(true)
             {
-                System.Console.WriteLine(">Amount spent: -" + transaction.Amount + " | date: "+ transaction.Date);
+            Console.WriteLine("Type one of the alternatives below to view spending stats :\n 'year' 'month' 'week' 'day' 'exit' ");
+            string myChoice = Console.ReadLine()!.ToLower();
+
+            switch(myChoice)
+            {
+                case "year": expenditure.AnnualSpending();
+                break;
+                case "month": expenditure.MonthSpend();
+                break;
+                case "week": expenditure.WeeklyExpenditure();
+                break;
+                case "day":  expenditure.DailySpending();
+                break;
+                case "exit": Console.WriteLine("back to the meny...");
+                return;
+
+            }
             }
         }
-        foreach(Transactions transaction in transactions)
+        catch
         {
-             if(transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
-             {
-                YearlySpending -= transaction.Amount;
-             }
+            throw new ArgumentNullException("Invalid input");
         }
-        System.Console.WriteLine($"In {yearInput} your total expenditure was {YearlySpending}");
-        System.Console.ReadKey();
     }
 }

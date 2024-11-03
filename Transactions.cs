@@ -9,6 +9,7 @@ using System.Globalization;
 
     public override string ToString()
     {
-        return "-Date: " + Date + "\n -Type of transaction: " + TransactionType + "\n Transfer amount: " + Amount;   
+        System.Console.WriteLine();
+        return " > Date: " + Date + "\n > Type of transaction: " + TransactionType + "\n > Transfer amount: " + Amount;   
     }
 }
