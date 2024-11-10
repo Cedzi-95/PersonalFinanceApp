@@ -58,6 +58,7 @@ public class Menu
                         break;
                     case 8:
                         account.DeleteTransactionsFromFile("accountData.Json");
+                        Console.ReadKey();
                         break;
                     case 9:
                         System.Console.WriteLine($"Are you sure you want to exit?  [{Colours.GREEN}YES{Colours.NORMAL}] or [{Colours.RED}NO{Colours.NORMAL}] ");
