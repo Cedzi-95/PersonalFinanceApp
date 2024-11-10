@@ -3,12 +3,15 @@ using System.Globalization;
 public class Expenditure
 {
 
-    private List<Transactions> transactions = new List<Transactions>();
+    private List<Transaction> transactions = new List<Transaction>();
 
-    public Expenditure(List<Transactions> transactions)
+    public Expenditure(List<Transaction> transactions)
     {
         this.transactions = transactions;
     }
+
+
+
 
 
 
@@ -18,21 +21,29 @@ public class Expenditure
 
         System.Console.Write("Enter the year: ");
         int yearInput = int.Parse(Console.ReadLine()!);
-        foreach(Transactions transaction in transactions)
+        foreach (Transaction transaction in transactions)
         {
-            if(transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
+            if (transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
             {
-                System.Console.WriteLine("> Amount spent: " + transaction.Amount + " | date: "+ transaction.Date);
+                Console.WriteLine($"> Amount spent:{Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
+                System.Console.WriteLine($"{Colours.NORMAL}");
                 YearlySpending -= transaction.Amount;
             }
         }
-        
-        System.Console.WriteLine($"In {yearInput} your total expenditure was {YearlySpending}");
+
+        System.Console.WriteLine($"In {yearInput} your total expenditure was {Colours.RED}{YearlySpending * -1}");
+        System.Console.WriteLine($"{Colours.NORMAL}");
         System.Console.ReadKey();
     }
+
+
+
+
+
+
     private string GetMonth(int month)
     {
-        if(month < 1 || month > 12)
+        if (month < 1 || month > 12)
         {
             throw new ArgumentOutOfRangeException("Invalid month input");
         }
@@ -40,13 +51,17 @@ public class Expenditure
         return date.ToString("MMMM");
     }
 
+
+
+
+
     public void MonthSpend()
     {
         decimal monthlySpending = 0;
 
         System.Console.Write("Enter month (1-12): ");
         int monthInput;
-        if(!int.TryParse(Console.ReadLine()!, out monthInput) || monthInput < 1 || monthInput > 12)
+        if (!int.TryParse(Console.ReadLine()!, out monthInput) || monthInput < 1 || monthInput > 12)
         {
             throw new ArgumentOutOfRangeException("Invalid month input");
         }
@@ -55,25 +70,32 @@ public class Expenditure
 
         string month = GetMonth(monthInput);
 
-        foreach(Transactions transaction in transactions)
+        foreach (Transaction transaction in transactions)
         {
-            
-            if(transaction.TransactionType == "w" && transaction.Date.Month.Equals(monthInput))
+
+            if (transaction.TransactionType == "w" && transaction.Date.Month.Equals(monthInput))
             {
-                if(transaction.Date.Year.Equals(yearInput))
-               {
-                 System.Console.WriteLine($"> Amount spent: {transaction.Amount} | Date: {transaction.Date}");
-                 monthlySpending -= transaction.Amount;
+                if (transaction.Date.Year.Equals(yearInput))
+                {
+                    Console.WriteLine($"> Amount spent: {Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
+                    System.Console.WriteLine($"{Colours.NORMAL}");
+                    monthlySpending -= transaction.Amount;
                 }
             }
-            
+
         }
 
-        System.Console.WriteLine($"In {month} {yearInput} your total expenditure was {monthlySpending} ");
+        System.Console.WriteLine($"In {month} {yearInput} your total expenditure was {monthlySpending * -1} ");
         Console.WriteLine();
         Console.ReadKey();
 
     }
+
+
+
+
+
+
 
     public void WeeklyExpenditure()
     {
@@ -81,7 +103,7 @@ public class Expenditure
 
         System.Console.Write("Enter week number (1-53): ");
         int weekNumInput;
-        if(!int.TryParse(Console.ReadLine()!, out weekNumInput) || weekNumInput < 1 || weekNumInput > 53)
+        if (!int.TryParse(Console.ReadLine()!, out weekNumInput) || weekNumInput < 1 || weekNumInput > 53)
         {
             throw new ArgumentOutOfRangeException("Invalid week input");
         }
@@ -93,32 +115,37 @@ public class Expenditure
         CalendarWeekRule weekRule = CalendarWeekRule.FirstDay;
         DayOfWeek firstDayOfWeek = DayOfWeek.Monday;
 
-        foreach(Transactions transaction in transactions)
+        foreach (Transaction transaction in transactions)
         {
-            if(transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
+            if (transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
             {
                 int WeekOfTheYear = calendar.GetWeekOfYear(transaction.Date, weekRule, firstDayOfWeek);
-                if(WeekOfTheYear == weekNumInput)
+                if (WeekOfTheYear == weekNumInput)
                 {
-                    System.Console.WriteLine($"> Amount spend {transaction.Amount} | Date: {transaction.Date}");
+                    Console.WriteLine($"> Amount spent: {Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
+                    System.Console.WriteLine($"{Colours.NORMAL}");
                     weeklySpending -= transaction.Amount;
                 }
             }
-        } 
-        System.Console.WriteLine($"In week {weekNumInput} of {yearInput} your total expenditure was {weeklySpending} ");
-        System.Console.WriteLine();
+        }
+        System.Console.WriteLine($"In week {weekNumInput} of {yearInput} your total expenditure was{Colours.RED} {weeklySpending * -1} ");
+        System.Console.WriteLine($"{Colours.NORMAL}");
         Console.ReadKey();
     }
 
+
+
+
+
+
     public void DailySpending()
     {
-        Console.Clear();
 
         decimal daySpending = 0;
 
         System.Console.Write("Enter day of the week (Monday-Sunday): ");
         string dayInput = Console.ReadLine()!;
-        if(!Enum.TryParse <DayOfWeek> (dayInput, true, out DayOfWeek dayOfWeek))
+        if (!Enum.TryParse<DayOfWeek>(dayInput, true, out DayOfWeek dayOfWeek))
         {
             System.Console.WriteLine("Invalid weekday input");
             return;
@@ -126,7 +153,7 @@ public class Expenditure
 
         System.Console.Write("Enter week of the year (1-53): ");
         int weekYearInput;
-        if(!int.TryParse(Console.ReadLine()!, out weekYearInput) || weekYearInput < 1 || weekYearInput > 53)
+        if (!int.TryParse(Console.ReadLine()!, out weekYearInput) || weekYearInput < 1 || weekYearInput > 53)
         {
             System.Console.WriteLine("Invalid week input");
             return;
@@ -139,20 +166,21 @@ public class Expenditure
         System.Console.Write("Enter year:");
         int yearInput = int.Parse(Console.ReadLine()!);
 
-        foreach(Transactions transaction in transactions)
+        foreach (Transaction transaction in transactions)
         {
-            if(transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
+            if (transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
             {
                 int weekYear = calendar.GetWeekOfYear(transaction.Date, weekRule, firstDayOfWeek);
-                if(weekYearInput == weekYear && transaction.Date.DayOfWeek.Equals(dayOfWeek))
+                if (weekYearInput == weekYear && transaction.Date.DayOfWeek.Equals(dayOfWeek))
                 {
-                    System.Console.WriteLine($"> Amount spent: {transaction.Amount} | Date: {transaction.Date}");
+                    Console.WriteLine($"> Amount spent: {Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
+                    System.Console.WriteLine($"{Colours.NORMAL}");
                     daySpending -= transaction.Amount;
                 }
             }
         }
-        System.Console.WriteLine($"On {dayInput} week {weekYearInput} of {yearInput} your total expenditure was {daySpending}");
-        System.Console.WriteLine();
+        System.Console.WriteLine($"On {dayInput} week {weekYearInput} of {yearInput} your total expenditure was {Colours.RED} {daySpending * -1}");
+        System.Console.WriteLine($"{Colours.NORMAL}");
         Console.ReadKey();
 
 

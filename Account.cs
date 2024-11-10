@@ -1,204 +1,309 @@
 using System.Globalization;
-
+using Newtonsoft.Json;
 public class Account
 {
-    private decimal balance {get; set;}
-    private List<Transactions> transactions = new List<Transactions>();
+    public decimal Balance { get; set; }
+    private List<Transaction> transactions = new List<Transaction>();
 
-    public void CreateTransactions()
+
+
+    public void CreateTransaction()
     {
 
         Console.Clear();
-       System.Console.WriteLine("Enter transaction type: press 'd' for Deposition and 'w' for Withdraw ");
-     string transactionInput = Console.ReadLine()!;
-     
-         System.Console.WriteLine("Enter amount: ");
-     decimal amount;
-  
-        if(!decimal.TryParse(Console.ReadLine()!, out amount) || amount <= 0)
+        Console.WriteLine($"Transaction type: Enter {Colours.GREEN}[d] for deposition{Colours.NORMAL} or {Colours.BLUE}[w] for Withdrawal{Colours.NORMAL} ");
+        string transactionInput = Console.ReadLine()!;
+
+        System.Console.WriteLine("Enter amount: ");
+        decimal amount;
+
+        if (!decimal.TryParse(Console.ReadLine()!, out amount) || amount <= 0)
         {
             System.Console.WriteLine("Invalid amount Please enter positive amount");
             return;
         }
- System.Console.WriteLine("Enter date: (yyyy-MM-dd) ");
+
+
+
+
+
+        System.Console.WriteLine("Enter date: (yyyy-MM-dd) ");
         string dateInput = Console.ReadLine()!;
         DateTime date;
         try
-       {
-         date = DateTime.ParseExact(dateInput, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-       }
-       catch(FormatException)
-       {
-        throw new ArgumentException("Invalid date input, please enter the date in the correct format");
-        
-       }
-     
-     Transactions transaction = new Transactions
-     {
-        Date = date,
-        TransactionType = transactionInput,
-        Balance = balance,
-        Amount = amount, 
-     };
-     
-
-    if(transactionInput.Equals("d"))
-    {
-            Deposition(amount);
-    }
-    else if (transactionInput.Equals("w"))
-    {
-        Withdraw(amount);
-    }
-    else
-    {
-        System.Console.WriteLine("Invalid transaction type");
-        return;
-    }
-
-    transactions.Add(transaction);
-    System.Console.WriteLine();
-     System.Console.WriteLine(transaction.ToString());
-     
-
-
-    }
-    public void GetAllTransactions()
-    {
-    System.Console.WriteLine("List of all the transactions ");
-        System.Console.WriteLine();
-        foreach(Transactions transaction in transactions)
         {
-           System.Console.WriteLine(transaction.ToString());
-           System.Console.WriteLine();
+            date = DateTime.ParseExact(dateInput, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+        catch (FormatException)
+        {
+            throw new ArgumentException($"{Colours.RED}Invalid date input, please enter the date in the correct format{Colours.NORMAL}");
+
         }
 
-        
-        Console.ReadKey();
+        Transaction transaction = new Transaction
+        {
+            Date = date,
+            TransactionType = transactionInput,
+            Amount = amount,
+        };
+
+
+        if (transactionInput.Equals("d"))
+        {
+            Deposition(amount);
+        }
+        else if (transactionInput.Equals("w") && amount < Balance)
+        {
+
+            Withdraw(amount);
+        }
+        else
+        {
+            System.Console.WriteLine($"{Colours.RED}Invalid transaction type{Colours.NORMAL}");
+            return;
+        }
+
+        transactions.Add(transaction);
+        System.Console.WriteLine();
+        System.Console.WriteLine(transaction.ToString());
+
+
 
     }
-
-
-
-    public void RemoveTransactions()
+    public void PrintAllTransactions()
     {
-        System.Console.WriteLine("Transaction deleted");
-     for(int i = 0; i < transactions.Count; i++)
-     {
-        transactions.Remove(transactions[i]);
+        System.Console.WriteLine($"{Colours.GREEN}List of all your transactions {Colours.NORMAL}");
+        System.Console.WriteLine();
+        foreach (Transaction transaction in transactions)
+        {
 
-     }     
-        
+            System.Console.WriteLine(transaction.ToString());
+            System.Console.WriteLine();
+        }
+
+
+        Console.ReadKey();
+
     }
 
 
 
     public void CheckBalance()
     {
-        System.Console.WriteLine("\n Current balance: " + balance);
+        System.Console.WriteLine($"\n{Colours.GREEN} Current balance:{Colours.GREEN} {Balance}");
+        System.Console.WriteLine($"{Colours.NORMAL}");
         System.Console.WriteLine("\n press key to continiue..");
         Console.ReadKey();
     }
 
 
+
+
     private void Deposition(decimal amount)
     {
         Console.Clear();
-        balance += amount;
-        System.Console.WriteLine($" Deposition amount: {amount} \n New balance: {balance}");
+        Balance += amount;
+        System.Console.WriteLine($" Deposition amount: {Colours.GREEN} {amount} {Colours.NORMAL} \n New balance:{Colours.GREEN} {Balance} {Colours.NORMAL}");
         System.Console.WriteLine("\n Press key to continue...");
         Console.ReadKey();
     }
 
 
+
+
     private void Withdraw(decimal amount)
     {
         Console.Clear();
-        if(amount > balance)
+        if (amount > Balance)
         {
-            System.Console.WriteLine("Insufficient funds");
-             System.Console.WriteLine("\n Press key to continue...");
-        Console.ReadKey();
+            System.Console.WriteLine($"{Colours.RED}Insufficient funds {Colours.NORMAL}");
+            Thread.Sleep(3000);
+
         }
-        else 
-       {
-         balance -= amount;
-      System.Console.WriteLine($"> Amount retreived: {amount} \n New balance: {balance}");
-       System.Console.WriteLine("\n Press key to continue...");
-        Console.ReadKey();
-      }
-    }
-
-
-    public void Income()
-    {
-         Income income = new Income(transactions);
-    try
-    {
-        while (true)
+        else
         {
-    Console.WriteLine("Type one of the alternatives below to view income stats :\n 'year' 'month' 'week' 'day' 'menu' ");
-    string myChoice = Console.ReadLine()!.ToLower();
-
-    switch(myChoice)
-    {
-        case "year": income.YearIncome();
-        break;
-        case "month": income.MonthlyIncome();
-        break;
-        case "week": income.WeekIncome();
-        break;
-        case "day": income.DailyIncome();
-        break;
-        
-        case "menu": System.Console.WriteLine("Back to the menu.");
-        return;
-    }
-
-           
-
-            
+            Balance -= amount;
+            System.Console.WriteLine($"> Amount retreived:{Colours.RED} {amount} {Colours.NORMAL} \n{Colours.GREEN}New balance: {Balance}");
+            System.Console.WriteLine($"{Colours.NORMAL}");
+            System.Console.WriteLine("\n Press key to continue...");
+            Console.ReadKey();
         }
     }
-    catch
+
+
+
+
+    //SAVING TO FILE
+    public void SaveToFile(string filePath)
     {
-        throw new ArgumentException("Invalid input");
-    }
-   
-
-    }
-
-
-    public void SpendingStats()
-    {
-        Expenditure expenditure = new Expenditure(transactions);
-
         try
         {
-            while(true)
+            var accountData = new
             {
-            Console.WriteLine("Type one of the alternatives below to view spending stats :\n 'year' 'month' 'week' 'day' 'exit' ");
-            string myChoice = Console.ReadLine()!.ToLower();
+                Balance,
+                Transactions = transactions
+            };
 
-            switch(myChoice)
+            string jsonData = JsonConvert.SerializeObject(accountData, Formatting.Indented); //encoding data to json file
+            File.WriteAllText(filePath, jsonData);
+            System.Console.WriteLine($"{Colours.GREEN}Data saved successfully!{Colours.NORMAL}");
+        }
+        catch (Exception e)
+        {
+            System.Console.WriteLine($"{Colours.RED}Error saving data: {e} {Colours.NORMAL}");
+        }
+    }
+
+
+
+
+    public void LoadFromFile(string filePath) //loading from file
+    {
+        try
+        {
+            if (File.Exists(filePath))
             {
-                case "year": expenditure.AnnualSpending();
-                break;
-                case "month": expenditure.MonthSpend();
-                break;
-                case "week": expenditure.WeeklyExpenditure();
-                break;
-                case "day":  expenditure.DailySpending();
-                break;
-                case "exit": Console.WriteLine("back to the meny...");
-                return;
+                string jsonData = File.ReadAllText(filePath);
+                System.Console.WriteLine("Raw data :\n" + jsonData); //display data from json file
 
+                var accountData = JsonConvert.DeserializeObject<dynamic>(jsonData);
+
+                System.Console.WriteLine($"{Colours.GREEN}Data loaded successfully");
+                System.Console.WriteLine($"{Colours.NORMAL}");
             }
+            else
+            {
+                System.Console.WriteLine($"{Colours.RED}File not found! {Colours.NORMAL}");
+            }
+        }
+        catch (Exception e)
+        {
+            System.Console.WriteLine($"Error loading data: {e}");
+        }
+    }
+
+
+
+
+    public void DeleteTransactionsFromFile(string filePath)
+    {
+
+        System.Console.WriteLine("Transactions to delete: [1] All transactions  [2] Single transaction");
+        int deleteTrans;
+        if (!int.TryParse(Console.ReadLine()!, out deleteTrans))
+        {
+            System.Console.WriteLine($"{Colours.RED} Invalid input! {Colours.NORMAL}");
+            return;
+        }
+        if (deleteTrans == 1)
+        {
+            transactions.Clear();
+            System.Console.WriteLine($"{Colours.RED} All transactions deleted. {Colours.NORMAL}");
+        }
+
+        else if (deleteTrans == 2)
+        {
+            System.Console.WriteLine("Enter index of the transactions to delete: (index must be equal or superior to 0)");
+            int index;
+            if (!int.TryParse(Console.ReadLine()!, out index) || index < 0 || index >= transactions.Count)
+            {
+                System.Console.WriteLine($"{Colours.RED} Invalid index input! {Colours.NORMAL}");
+                return;
+            }
+            transactions.RemoveAt(index);
+            System.Console.WriteLine($"{Colours.GREEN} chosen transactions are deleted {Colours.NORMAL}");
+        }
+        else
+        {
+            System.Console.WriteLine($"{Colours.RED} Invalid Choice {Colours.NORMAL}");
+        }
+        SaveToFile(filePath);
+
+    }
+
+
+
+
+
+    public void PrintIncome()
+    {
+        Income income = new Income(transactions); //new instance of an income object
+        try
+        {
+            while (true)
+            {
+                Console.WriteLine($"Type one of the alternatives below to view income stats :\n'year' 'month' 'week' 'day' 'exit' ");
+                string myChoice = Console.ReadLine()!.ToLower();
+
+                switch (myChoice)
+                {
+                    case "year":
+                        income.YearIncome();
+                        break;
+                    case "month":
+                        income.MonthlyIncome();
+                        break;
+                    case "week":
+                        income.WeekIncome();
+                        break;
+                    case "day":
+                        income.DailyIncome();
+                        break;
+
+                    case "exit":
+                        System.Console.WriteLine("Back to the main menu.");
+                        return;
+                }
+
             }
         }
         catch
         {
-            throw new ArgumentNullException("Invalid input");
+            throw new ArgumentNullException($"{Colours.RED}Invalid input! {Colours.NORMAL}");
+        }
+
+
+    }
+
+
+
+
+
+    public void PrintExpenditures()
+    {
+        Expenditure expenditure = new Expenditure(transactions); //new instance of expediture object
+
+        try
+        {
+            while (true)
+            {
+                Console.WriteLine("Type one of the alternatives below to view spending stats :\n 'year' 'month' 'week' 'day' 'exit' ");
+                string myChoice = Console.ReadLine()!.ToLower();
+
+                switch (myChoice)
+                {
+                    case "year":
+                        expenditure.AnnualSpending();
+                        break;
+                    case "month":
+                        expenditure.MonthSpend();
+                        break;
+                    case "week":
+                        expenditure.WeeklyExpenditure();
+                        break;
+                    case "day":
+                        expenditure.DailySpending();
+                        break;
+                    case "exit":
+                        Console.WriteLine("back to the meny...");
+                        return;
+
+                }
+            }
+        }
+        catch
+        {
+            throw new ArgumentNullException($"{Colours.RED}Invalid input {Colours.NORMAL}");
         }
     }
 }
