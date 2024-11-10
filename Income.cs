@@ -1,12 +1,13 @@
 using System.Globalization;
 
-public class Income 
+public class Income
 {
-   
-    
-    private List<Transactions> transactions = new List<Transactions>();
 
-    public Income(List<Transactions> transactions)
+
+    private List<Transaction> transactions = new List<Transaction>();
+
+
+    public Income(List<Transaction> transactions)
     {
         this.transactions = transactions;
     }
@@ -15,33 +16,37 @@ public class Income
     public void YearIncome()
     {
         Console.Clear();
-           decimal YearlyIncome = 0;
+        decimal YearlyIncome = 0;
 
         System.Console.Write("Enter the year: ");
         int input = int.Parse(Console.ReadLine()!);
         System.Console.WriteLine();
-       foreach(Transactions transaction in transactions)
-       {
-        if(transaction.TransactionType == "d" && transaction.Date.Year.Equals(input))
-        {       
-            System.Console.WriteLine("> Amount received: " + transaction.Amount + " | date: " + transaction.Date);
-            YearlyIncome += transaction.Amount;
+        foreach (Transaction transaction in transactions)
+        {
+            if (transaction.TransactionType == "d" && transaction.Date.Year.Equals(input))
+            {
+                Console.WriteLine($"> Amount received:{Colours.GREEN} {transaction.Amount}{Colours.NORMAL}| Date: {Colours.BLUE}{transaction.Date}{Colours.NORMAL}");
+
+                YearlyIncome += transaction.Amount;
+            }
         }
-       }
-       System.Console.WriteLine($"In {input} your total income was: {YearlyIncome}");
-       System.Console.WriteLine();
-       Console.ReadKey();
+        System.Console.WriteLine($"In {input} your total income was: {YearlyIncome}");
+        System.Console.WriteLine();
+        Console.ReadKey();
     }
+
+
+
 
     public void MonthlyIncome()
     {
         Console.Clear();
 
-         decimal monthIncome = 0;
-        
+        decimal monthIncome = 0;
+
         System.Console.Write("Enter the month (1-12): ");
         int monthInput;
-        if(!int.TryParse(Console.ReadLine()!, out monthInput) || monthInput < 1 || monthInput > 12)
+        if (!int.TryParse(Console.ReadLine()!, out monthInput) || monthInput < 1 || monthInput > 12)
         {
             System.Console.WriteLine("Invalid month input");
             return;
@@ -51,32 +56,38 @@ public class Income
 
         string monthName = GetMonth(monthInput);
 
-    foreach(Transactions transaction in transactions)
-    {
-        if(transaction.TransactionType == "d" && transaction.Date.Month.Equals(monthInput))
+        foreach (Transaction transaction in transactions)
         {
-            if(transaction.Date.Year.Equals(yearInput))
+            if (transaction.TransactionType == "d" && transaction.Date.Month.Equals(monthInput))
             {
-                System.Console.WriteLine("> Amount received: " + transaction.Amount + "| Date: " + transaction.Date);
-                 monthIncome += transaction.Amount;
+                if (transaction.Date.Year.Equals(yearInput))
+                {
+                    Console.WriteLine($"> Amount received:{Colours.GREEN} {transaction.Amount}{Colours.NORMAL}| Date: {Colours.BLUE}{transaction.Date}{Colours.NORMAL}");
+                    monthIncome += transaction.Amount;
+                }
             }
         }
+        System.Console.WriteLine($"In {monthName} {yearInput} your total income was {Colours.GREEN}{monthIncome}");
+        System.Console.WriteLine($"{Colours.NORMAL}");
+        Console.ReadKey();
+
     }
-    System.Console.WriteLine($"In {monthName} {yearInput} your total income was {monthIncome}");
-    System.Console.WriteLine();
-    Console.ReadKey();
-       
-    }
+
+
+
     private string GetMonth(int month)
     {
-        if(month < 1 || month > 12)
+        if (month < 1 || month > 12)
         {
             throw new ArgumentOutOfRangeException("Invalid month input");
         }
         DateTime date = new DateTime(2020, month, 1);
         return date.ToString("MMMM");
     }
-    
+
+
+
+
 
     public void WeekIncome()
     {
@@ -84,7 +95,7 @@ public class Income
         decimal weeklyIncome = 0;
         System.Console.Write("Enter week number (1-53): ");
         int weekInput;
-        if(!int.TryParse(Console.ReadLine()!, out weekInput) || weekInput < 1 || weekInput > 52)
+        if (!int.TryParse(Console.ReadLine()!, out weekInput) || weekInput < 1 || weekInput > 52)
         {
             System.Console.WriteLine("Invalid week input");
             return;
@@ -96,23 +107,27 @@ public class Income
         CalendarWeekRule weekRule = CalendarWeekRule.FirstDay;
         DayOfWeek firstDayOfWeek = DayOfWeek.Monday;
 
-        foreach(Transactions transaction in transactions)
+        foreach (Transaction transaction in transactions)
         {
-            if(transaction.TransactionType == "d" && transaction.Date.Year.Equals(YearInput))
+            if (transaction.TransactionType == "d" && transaction.Date.Year.Equals(YearInput))
             {
                 int WeekOfTheYear = calendar.GetWeekOfYear(transaction.Date, weekRule, firstDayOfWeek);
-                if(WeekOfTheYear == weekInput)
+                if (WeekOfTheYear == weekInput)
                 {
-                    System.Console.WriteLine("> Amount received: " + transaction.Amount + "| Date: " + transaction.Date);
+                    Console.WriteLine($"> Amount received:{Colours.GREEN} {transaction.Amount}{Colours.NORMAL}| Date: {Colours.BLUE}{transaction.Date}{Colours.NORMAL}");
                     weeklyIncome += transaction.Amount;
                 }
             }
         }
-        System.Console.WriteLine($"In week {weekInput} of {YearInput} your total income was {weeklyIncome}");
-        System.Console.WriteLine();
+        System.Console.WriteLine($"In week {weekInput} of {YearInput} your total income was{Colours.GREEN}{weeklyIncome}");
+        System.Console.WriteLine($"{Colours.NORMAL}");
         Console.ReadKey();
 
     }
+
+
+
+
 
     public void DailyIncome()
     {
@@ -122,16 +137,16 @@ public class Income
 
         System.Console.Write("Enter day of the week (Monday - Sunday): ");
         string dayInput = Console.ReadLine()!;
-        if(!Enum.TryParse <DayOfWeek>(dayInput, true, out DayOfWeek dayOfWeek))
+        if (!Enum.TryParse<DayOfWeek>(dayInput, true, out DayOfWeek dayOfWeek))
         {
             System.Console.WriteLine("Invalid weekday input");
             return;
         }
-        
+
 
         System.Console.Write("Enter week number (1-53): ");
-         int weekInput;
-        if(!int.TryParse(Console.ReadLine()!, out weekInput) || weekInput < 1 || weekInput > 53)
+        int weekInput;
+        if (!int.TryParse(Console.ReadLine()!, out weekInput) || weekInput < 1 || weekInput > 53)
         {
             System.Console.WriteLine("Invalid week input");
             return;
@@ -144,19 +159,19 @@ public class Income
         DayOfWeek firstDayOfWeek = DayOfWeek.Monday;
 
 
-        foreach(Transactions transaction in transactions)
+        foreach (Transaction transaction in transactions)
         {
-            if(transaction.TransactionType == "d" && transaction.Date.Year.Equals(YearInput1))
+            if (transaction.TransactionType == "d" && transaction.Date.Year.Equals(YearInput1))
             {
                 int WeekOfTheYear = calendar.GetWeekOfYear(transaction.Date, weekRule, firstDayOfWeek);
-                if(weekInput == WeekOfTheYear && transaction.Date.DayOfWeek.Equals(dayOfWeek))
+                if (weekInput == WeekOfTheYear && transaction.Date.DayOfWeek.Equals(dayOfWeek))
                 {
-                    System.Console.WriteLine("> Amount received: " + transaction.Amount + "| Date: " + transaction.Date);
+                    Console.WriteLine($"> Amount received:{Colours.GREEN} {transaction.Amount}{Colours.NORMAL}| Date: {Colours.BLUE}{transaction.Date}{Colours.NORMAL}");
                     dayIncome += transaction.Amount;
                 }
             }
         }
-        System.Console.WriteLine($"On {dayInput} week {weekInput} {YearInput1}, your total income was {dayIncome}.  ");
+        System.Console.WriteLine($"On {dayInput} week {weekInput} {YearInput1}, your total income was {Colours.GREEN}{dayIncome}{Colours.NORMAL}.  ");
         System.Console.WriteLine();
         Console.ReadKey();
     }
