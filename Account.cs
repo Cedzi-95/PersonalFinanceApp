@@ -19,7 +19,9 @@ public class Account
 
         if (!decimal.TryParse(Console.ReadLine()!, out amount) || amount <= 0)
         {
-            System.Console.WriteLine("Invalid amount Please enter positive amount");
+            System.Console.WriteLine($"{Colours.RED}");
+            System.Console.WriteLine($"Usage: Enter positive amount and use a ',' if amount is a decimal!{Colours.NORMAL}");
+            Console.ReadKey();
             return;
         }
 
@@ -36,7 +38,11 @@ public class Account
         }
         catch (FormatException)
         {
-            throw new ArgumentException($"{Colours.RED}Invalid date input, please enter the date in the correct format{Colours.NORMAL}");
+           
+            System.Console.WriteLine($"{Colours.RED}Invalid date input, please enter the date in the correct format{Colours.NORMAL}");
+            Console.ReadKey();
+            throw new ArgumentException();
+           
 
         }
 
@@ -52,15 +58,18 @@ public class Account
         {
             Deposition(amount);
         }
-        else if (transactionInput.Equals("w") && amount < Balance)
+        else if (transactionInput.Equals("w") && amount <= Balance)
         {
 
             Withdraw(amount);
+            
         }
-        else
+        
+        else 
         {
-            System.Console.WriteLine($"{Colours.RED}Invalid transaction type{Colours.NORMAL}");
-            return;
+            System.Console.WriteLine($"{Colours.RED}Invalid transaction type or insuffiecient funds{Colours.NORMAL}");
+            Console.ReadKey();
+             return;
         }
 
         transactions.Add(transaction);
@@ -114,19 +123,20 @@ public class Account
     private void Withdraw(decimal amount)
     {
         Console.Clear();
-        if (amount > Balance)
+        if (amount <= Balance)
         {
-            System.Console.WriteLine($"{Colours.RED}Insufficient funds {Colours.NORMAL}");
-            Thread.Sleep(3000);
-
-        }
-        else
-        {
+           
             Balance -= amount;
             System.Console.WriteLine($"> Amount retreived:{Colours.RED} {amount} {Colours.NORMAL} \n{Colours.GREEN}New balance: {Balance}");
             System.Console.WriteLine($"{Colours.NORMAL}");
             System.Console.WriteLine("\n Press key to continue...");
             Console.ReadKey();
+
+        }
+        else
+        {
+             System.Console.WriteLine($"{Colours.RED}Insufficient funds {Colours.NORMAL}");
+           Console.ReadKey();
         }
     }
 
