@@ -9,11 +9,7 @@ public class Expenditure
     {
         this.transactions = transactions;
     }
-
-
-
-
-
+   
 
     public void AnnualSpending()
     {
@@ -187,4 +183,8 @@ public class Expenditure
 
     }
 
+    internal static void Run(string v)
+    {
+        throw new NotImplementedException();
+    }
 }

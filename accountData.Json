@@ -1,65 +1,15 @@
 {
-  "Balance": 1010.10,
+  "Balance": 700.0,
   "Transactions": [
     {
-      "Date": "2024-11-11T00:00:00",
+      "Date": "2024-12-10T00:00:00",
       "TransactionType": "d",
-      "Amount": 500.0
-    },
-    {
-      "Date": "2024-11-13T00:00:00",
-      "TransactionType": "d",
-      "Amount": 300.0
-    },
-    {
-      "Date": "2024-11-14T00:00:00",
-      "TransactionType": "d",
-      "Amount": 300.0
-    },
-    {
-      "Date": "2024-09-11T00:00:00",
-      "TransactionType": "d",
-      "Amount": 300.0
-    },
-    {
-      "Date": "2024-11-11T00:00:00",
-      "TransactionType": "d",
-      "Amount": 300.0
-    },
-    {
-      "Date": "2024-11-16T00:00:00",
-      "TransactionType": "d",
-      "Amount": 230.1
-    },
-    {
-      "Date": "2024-11-11T00:00:00",
-      "TransactionType": "w",
-      "Amount": 230.0
-    },
-    {
-      "Date": "2024-11-12T00:00:00",
-      "TransactionType": "w",
-      "Amount": 400.0
-    },
-    {
-      "Date": "2024-11-13T00:00:00",
-      "TransactionType": "w",
-      "Amount": 300.0
-    },
-    {
-      "Date": "2024-11-01T00:00:00",
-      "TransactionType": "d",
-      "Amount": 230.12
-    },
-    {
-      "Date": "2024-11-10T00:00:00",
-      "TransactionType": "w",
       "Amount": 200.0
     },
     {
-      "Date": "2024-11-11T00:00:00",
-      "TransactionType": "w",
-      "Amount": 20.12
+      "Date": "2024-12-12T00:00:00",
+      "TransactionType": "d",
+      "Amount": 500.0
     }
   ]
 }
