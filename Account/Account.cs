@@ -2,7 +2,9 @@ using System.Globalization;
 using Newtonsoft.Json;
 public class Account
 {
+    public Guid Account_Id {get; init;}
     public decimal Balance { get; set; }
+    
     private List<Transaction> transactions = new List<Transaction>();
 
 
