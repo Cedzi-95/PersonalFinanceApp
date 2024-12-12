@@ -24,12 +24,12 @@ class Program
         
         CREATE TABLE IF NOT EXISTS users (
         user_id UUID PRIMARY KEY,
-        user_name TEXT,
+        username TEXT,
         password TEXT
         );
 
         
-        CREATE TABLE accounts (
+        CREATE TABLE IF NOT EXISTS accounts (
         account_id UUID PRIMARY KEY,
         user_id UUID,
         balance DECIMAL (15,2),
@@ -41,6 +41,7 @@ class Program
         CREATE TABLE IF NOT EXISTS transactions (
         transaction_id uuid PRIMARY KEY,
         account_id UUID NOT NULL,
+        type text,
         transaction_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         amount DECIMAL (15,2),
         CONSTRAINT fk_account

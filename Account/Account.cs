@@ -2,9 +2,9 @@ using System.Globalization;
 using Newtonsoft.Json;
 public class Account
 {
-    public Guid Account_Id {get; init;}
+    public Guid AccountId {get; init;}
     public decimal Balance { get; set; }
-    
+
     private List<Transaction> transactions = new List<Transaction>();
 
 
@@ -12,71 +12,7 @@ public class Account
     public void CreateTransaction()
     {
 
-        Console.Clear();
-        Console.WriteLine($"Transaction type: Enter {Colours.GREEN}[d] for deposition{Colours.NORMAL} or {Colours.BLUE}[w] for Withdrawal{Colours.NORMAL} ");
-        string transactionInput = Console.ReadLine()!;
-
-        System.Console.WriteLine("Enter amount: ");
-        decimal amount;
-
-        if (!decimal.TryParse(Console.ReadLine()!, out amount) || amount <= 0)
-        {
-            System.Console.WriteLine($"{Colours.RED}");
-            System.Console.WriteLine($"Usage: Enter positive amount and use a ',' if amount is a decimal!{Colours.NORMAL}");
-            Console.ReadKey();
-            return;
-        }
-
-
-
-
-
-        System.Console.WriteLine("Enter date: (yyyy-MM-dd) ");
-        string dateInput = Console.ReadLine()!;
-        DateTime date;
-        try
-        {
-            date = DateTime.ParseExact(dateInput, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        }
-        catch (FormatException)
-        {
-           
-            System.Console.WriteLine($"{Colours.RED}Invalid date input, please enter the date in the correct format{Colours.NORMAL}");
-            Console.ReadKey();
-            throw new ArgumentException();
-           
-
-        }
-
-        Transaction transaction = new Transaction
-        {
-            Date = date,
-            TransactionType = transactionInput,
-            Amount = amount,
-        };
-
-
-        if (transactionInput.Equals("d"))
-        {
-            Deposition(amount);
-        }
-        else if (transactionInput.Equals("w") && amount <= Balance)
-        {
-
-            Withdraw(amount);
-            
-        }
-        
-        else 
-        {
-            System.Console.WriteLine($"{Colours.RED}Invalid transaction type or insuffiecient funds{Colours.NORMAL}");
-            Console.ReadKey();
-             return;
-        }
-
-        transactions.Add(transaction);
-        System.Console.WriteLine();
-        System.Console.WriteLine(transaction.ToString());
+      
 
 
 
