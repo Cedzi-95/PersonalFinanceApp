@@ -1,6 +1,6 @@
 public interface IaccountManager
 {
-    void loggin();
+   
     void CreateTransaction();
     void CheckBalance();
     void PrintAllTransactions();

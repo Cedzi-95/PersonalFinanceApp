@@ -17,10 +17,10 @@ public class PostgresUserService : IUserService
             return null;
         }
 
-        var sql = @"SELECT * FROM users WHERE user_id = @id";
+        var sql = @"SELECT * FROM users WHERE user_id = @userId";
         using var cmd = new NpgsqlCommand(sql, this.connection);
 
-        cmd.Parameters.AddWithValue("@id", LoggedInuser);
+        cmd.Parameters.AddWithValue("@userId", LoggedInuser);
 
         using var reader = cmd.ExecuteReader();
 
@@ -57,17 +57,42 @@ public class PostgresUserService : IUserService
             Password = reader.GetString(2)
         };
 
-        LoggedInuser =user.UserId;
+        LoggedInuser = user.UserId;
 
         return user;
     }
 
-    public void Logout()
+    public User Logout()
     {
-        LoggedInuser = null;
+         LoggedInuser = null;
+         return null;
     }
 
     public User RegisterUser(string username, string password)
+    {
+       var user = new User
+       {
+        UserId = Guid.NewGuid(),
+        Name = username,
+        Password = password
+       };
+
+       var sql = @"INSERT INTO users(user_id, username, password) VALUES (
+       @user_id,
+       @username,
+       @password);";
+
+       using var cmd = new NpgsqlCommand (sql, this.connection);
+       cmd.Parameters.AddWithValue("@user_id", user.UserId);
+       cmd.Parameters.AddWithValue("@username", user.Name);
+       cmd.Parameters.AddWithValue("@password", user.Password);
+
+       cmd.ExecuteNonQuery();
+       
+       return user;
+    }
+
+    void IUserService.Logout()
     {
         throw new NotImplementedException();
     }
