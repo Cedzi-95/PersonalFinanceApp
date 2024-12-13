@@ -9,14 +9,7 @@ public class Account
 
 
 
-    public void CreateTransaction()
-    {
-
-      
-
-
-
-    }
+   
     public void PrintAllTransactions()
     {
         System.Console.WriteLine($"{Colours.GREEN}List of all your transactions {Colours.NORMAL}");
@@ -35,48 +28,8 @@ public class Account
 
 
 
-    public void CheckBalance()
-    {
-        System.Console.WriteLine($"\n{Colours.GREEN} Current balance:{Colours.GREEN} {Balance}");
-        System.Console.WriteLine($"{Colours.NORMAL}");
-        System.Console.WriteLine("\n press key to continiue..");
-        Console.ReadKey();
-    }
+   
 
-
-
-
-    private void Deposition(decimal amount)
-    {
-        Console.Clear();
-        Balance += amount;
-        System.Console.WriteLine($" Deposition amount: {Colours.GREEN} {amount} {Colours.NORMAL} \n New balance:{Colours.GREEN} {Balance} {Colours.NORMAL}");
-        System.Console.WriteLine("\n Press key to continue...");
-        Console.ReadKey();
-    }
-
-
-
-
-    private void Withdraw(decimal amount)
-    {
-        Console.Clear();
-        if (amount <= Balance)
-        {
-           
-            Balance -= amount;
-            System.Console.WriteLine($"> Amount retreived:{Colours.RED} {amount} {Colours.NORMAL} \n{Colours.GREEN}New balance: {Balance}");
-            System.Console.WriteLine($"{Colours.NORMAL}");
-            System.Console.WriteLine("\n Press key to continue...");
-            Console.ReadKey();
-
-        }
-        else
-        {
-             System.Console.WriteLine($"{Colours.RED}Insufficient funds {Colours.NORMAL}");
-           Console.ReadKey();
-        }
-    }
 
 
 
@@ -173,85 +126,13 @@ public class Account
 
 
 
-    public void PrintIncome()
-    {
-        Income income = new Income(transactions); //new instance of an income object
-        try
-        {
-            while (true)
-            {
-                Console.WriteLine($"Type one of the alternatives below to view income stats :\n'year' 'month' 'week' 'day' 'exit' ");
-                string myChoice = Console.ReadLine()!.ToLower();
-
-                switch (myChoice)
-                {
-                    case "year":
-                        income.YearIncome();
-                        break;
-                    case "month":
-                        income.MonthlyIncome();
-                        break;
-                    case "week":
-                        income.WeekIncome();
-                        break;
-                    case "day":
-                        income.DailyIncome();
-                        break;
-
-                    case "exit":
-                        System.Console.WriteLine("Back to the main menu.");
-                        return;
-                }
-
-            }
-        }
-        catch
-        {
-            throw new ArgumentNullException($"{Colours.RED}Invalid input! {Colours.NORMAL}");
-        }
+   
 
 
-    }
+    
 
 
 
 
 
-    public void PrintExpenditures()
-    {
-        Expenditure expenditure = new Expenditure(transactions); //new instance of expediture object
-
-        try
-        {
-            while (true)
-            {
-                Console.WriteLine("Type one of the alternatives below to view spending stats :\n 'year' 'month' 'week' 'day' 'exit' ");
-                string myChoice = Console.ReadLine()!.ToLower();
-
-                switch (myChoice)
-                {
-                    case "year":
-                        expenditure.AnnualSpending();
-                        break;
-                    case "month":
-                        expenditure.MonthSpend();
-                        break;
-                    case "week":
-                        expenditure.WeeklyExpenditure();
-                        break;
-                    case "day":
-                        expenditure.DailySpending();
-                        break;
-                    case "exit":
-                        Console.WriteLine("back to the meny...");
-                        return;
-
-                }
-            }
-        }
-        catch
-        {
-            throw new ArgumentNullException($"{Colours.RED}Invalid input {Colours.NORMAL}");
-        }
-    }
 }

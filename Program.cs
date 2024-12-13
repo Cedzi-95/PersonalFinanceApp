@@ -54,9 +54,31 @@ class Program
         createTableCmd.ExecuteNonQuery();
 
 
+        IUserService userService = new PostgresUserService(connection);
+        IaccountManager accountManager = new PostgresAccount(userService, connection);
+        ImenuService menuService = new SimpleMenuService();
+        Menu initialMenu = new LoginMenu(userService, menuService, accountManager);
+
+        menuService.SetMenu(initialMenu);
+
+        while (true)
+        {
+            string? inputCommand = Console.ReadLine();
+
+            if (inputCommand != null)
+            {
+                menuService.GetMenu().ExecuteCommand(inputCommand);
+            }
+            else 
+            {
+                break;
+            }
+        }
 
 
-     Menu.Execute();
+
+
+    //  Menu.Execute();
      
     }
 

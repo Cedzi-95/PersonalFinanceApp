@@ -91,4 +91,9 @@ public class PostgresUserService : IUserService
        
        return user;
     }
+
+    void IUserService.Logout()
+    {
+        throw new NotImplementedException();
+    }
 }
