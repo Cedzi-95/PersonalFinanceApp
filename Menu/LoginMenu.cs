@@ -8,6 +8,6 @@ public class LoginMenu : Menu
 
     public override void Display()
     {
-        System.Console.WriteLine("Welcome to your finance application. Type 'login' to loggin");
+        System.Console.WriteLine("Welcome to your finance application. Type 'login' to login");
     }
 }

@@ -1,7 +1,7 @@
 public class CheckBalanceCommand : Command
 {
     public CheckBalanceCommand(IUserService userService, ImenuService menuService, IaccountManager accountManager) :
-    base ("check-balance", "check my balance", userService, menuService, accountManager)
+    base ("check-balance", userService, menuService, accountManager)
     {
 
     }

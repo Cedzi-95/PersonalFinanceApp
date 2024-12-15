@@ -42,9 +42,9 @@ class Program
         transaction_id uuid PRIMARY KEY,
         account_id UUID NOT NULL,
         type text,
-        transaction_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
         amount DECIMAL (15,2),
-        CONSTRAINT fk_account
+
         FOREIGN KEY (account_id) REFERENCES accounts (account_id) ON DELETE CASCADE
         );
         
@@ -63,7 +63,7 @@ class Program
 
         while (true)
         {
-            string? inputCommand = Console.ReadLine();
+            string? inputCommand = Console.ReadLine()!.ToLower();
 
             if (inputCommand != null)
             {

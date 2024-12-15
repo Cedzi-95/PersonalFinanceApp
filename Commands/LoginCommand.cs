@@ -1,7 +1,7 @@
 public class LoginCommand : Command
 {
-     public LoginCommand(IUserService userService, ImenuService menuService, IaccountManager accountManger) : base
-     ("Login", "Login with username and password.", userService, menuService, accountManger) {}
+     public LoginCommand(IUserService userService, ImenuService menuService, IaccountManager accountManager) : base
+     ("login", userService, menuService, accountManager) {}
 
     public override void Execute(string[] args)
     {
