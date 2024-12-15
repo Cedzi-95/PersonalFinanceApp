@@ -4,7 +4,7 @@ public class CreateTransactionCommand : Command
 
     public CreateTransactionCommand(IUserService userService, ImenuService menuService, IaccountManager accountManager) :  base 
     
-    ("Create-transaction", " ", userService, menuService, accountManager)
+    ("create-transaction", userService, menuService, accountManager)
     {
 
     }

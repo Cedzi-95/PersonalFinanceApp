@@ -39,7 +39,7 @@ public class PostgresUserService : IUserService
 
     public User? login(string username, string password)
     {
-        var sql = @"SELECT * FROM users WHERE user_name = @username AND password = @password";
+        var sql = @"SELECT * FROM users WHERE username = @username AND password = @password";
         using var cmd = new NpgsqlCommand(sql, this.connection);
         cmd.Parameters.AddWithValue("@username", username);
         cmd.Parameters.AddWithValue("@password", password);
@@ -88,8 +88,20 @@ public class PostgresUserService : IUserService
        cmd.Parameters.AddWithValue("@password", user.Password);
 
        cmd.ExecuteNonQuery();
+       CreateAccountForUser(user.UserId);
        
        return user;
+    }
+
+    private void CreateAccountForUser(Guid userId)
+    {
+        var sql = @"INSERT INTO accounts(account_id, user_id, balance) VALUES
+        (@account_id, @user_id, 0)";
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@account_id", Guid.NewGuid());
+        cmd.Parameters.AddWithValue("@user_id", userId);
+
+        cmd.ExecuteNonQuery();
     }
 
     void IUserService.Logout()

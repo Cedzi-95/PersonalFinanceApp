@@ -1,5 +1,9 @@
 public class UserMenu : Menu
 {
+    private IUserService userService;
+    private ImenuService menuService;
+    private IaccountManager accountManager;
+
     public UserMenu(IUserService userService, ImenuService menuService, IaccountManager accountManager)
     {
         AddCommand(new CreateTransactionCommand(userService, menuService, accountManager));
@@ -7,6 +11,13 @@ public class UserMenu : Menu
         AddCommand(new DeleteTransactionsCommand(userService, menuService, accountManager));
         AddCommand(new LogoutCommand(userService, menuService, accountManager));
     }
+
+    // public UserMenu(IUserService userService, ImenuService menuService, IaccountManager accountManager)
+    // {
+    //     this.userService = userService;
+    //     this.menuService = menuService;
+    //     this.accountManager = accountManager;
+    // }
 
     public override void Display()
     {

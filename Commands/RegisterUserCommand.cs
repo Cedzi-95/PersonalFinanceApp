@@ -1,7 +1,7 @@
 public class RegisterUserCommand : Command
 {
     public RegisterUserCommand (IUserService userService, ImenuService menuService, IaccountManager accountManager) :
-    base ("register-user", "create a new user account", userService, menuService, accountManager) {}
+    base ("register-user", userService, menuService, accountManager) {}
 public override void Execute(string[] args)
     {
        string username = args[1];
