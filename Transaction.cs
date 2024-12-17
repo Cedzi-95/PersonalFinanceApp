@@ -3,7 +3,8 @@ using System.Globalization;
  public class Transaction
 {
     public Guid TransactionId {get; init;}
-    public DateTime Date {get; set;}
+    public User? User {get; init;}
+    public DateTime Date {get; init;}
     public string? TransactionType {get; set;}
     public decimal Amount {get; set;}
     //  public decimal Balance {get; set;}

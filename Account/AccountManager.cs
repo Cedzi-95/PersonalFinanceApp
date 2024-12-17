@@ -1,13 +1,12 @@
 public interface IaccountManager
 {
     Transaction  CollectTransactionDetails();
+
    
     void CreateTransaction();
     void CheckBalance();
-    void PrintAllTransactions();
+    List<Transaction> PrintAllTransactions(Guid accountId);
     void DeleteTransactions();
     void PrintIncome();
     void PrintExpenditures();
-
-
 }

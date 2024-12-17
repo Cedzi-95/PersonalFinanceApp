@@ -8,7 +8,7 @@ public class PostgresAccount : IaccountManager
     public decimal balance { get; set; }
     private List<Transaction> transactions = new List<Transaction>();
 
-    public PostgresAccount(IUserService userService, NpgsqlConnection connection)
+    public PostgresAccount(IUserService userService, NpgsqlConnection connection, decimal balance)
     {
         this.userService = userService;
         this.connection = connection;
@@ -17,6 +17,7 @@ public class PostgresAccount : IaccountManager
 
     public void CheckBalance()
     {
+        
         System.Console.WriteLine($"\n{Colours.GREEN} Current balance:{Colours.GREEN} {balance}");
         System.Console.WriteLine($"{Colours.NORMAL}");
         System.Console.WriteLine("\n press key to continiue..");
@@ -42,7 +43,7 @@ public class PostgresAccount : IaccountManager
         var transaction = CollectTransactionDetails();
 
         ProcessTransaction(transaction);
-        SaveTransactionToDatabase(transaction, accountId.Value);
+        SaveTransactionToDatabase(transaction, accountId.Value, user.UserId);
         DisplayTransactionSummary(transaction);
         transactions.Add(transaction);
 
@@ -156,7 +157,7 @@ public class PostgresAccount : IaccountManager
         }
     }
 
-    private void SaveTransactionToDatabase(Transaction transaction, Guid accountId)
+    private void SaveTransactionToDatabase(Transaction transaction, Guid accountId, Guid userId)
     {
         const string sql = @"
         INSERT INTO transactions (transaction_id, account_id, date, amount, type) 
@@ -168,6 +169,15 @@ public class PostgresAccount : IaccountManager
         cmd.Parameters.AddWithValue("@date", transaction.Date);
         cmd.Parameters.AddWithValue("@amount", transaction.Amount);
         cmd.Parameters.AddWithValue("@type", transaction.TransactionType);
+
+
+
+        var accountSql = @"INSERT INTO accounts (account_id, user_id, balance) VALUES (@account_id, @user_id, @balance)";
+        using var accountCmd = new NpgsqlCommand(accountSql, connection);
+        accountCmd.Parameters.AddWithValue("@account_id", accountId);
+         accountCmd.Parameters.AddWithValue("@user_id", userId);
+          accountCmd.Parameters.AddWithValue("@balance", balance += transaction.Amount);
+
 
         cmd.ExecuteNonQuery();
     }
@@ -271,9 +281,48 @@ public class PostgresAccount : IaccountManager
         throw new NotImplementedException();
     }
 
-    public void PrintAllTransactions()
+    // public void PrintAllTransactions(Transaction transaction, Guid accountId)
+    // {
+    //     var sql = @"SELECT FROM transactions WHERE account_id = @account_id";
+    //     using var cmd = new NpgsqlCommand(sql, connection);
+    //     cmd.Parameters.AddWithValue("@account_id", accountId);
+    // }
+
+    public List<Transaction> PrintAllTransactions(Guid accountId)
     {
-        throw new NotImplementedException();
+        
+       var sql = @"SELECT u.username, t.type, t.amount, t.date
+       FROM users u
+       JOIN accounts a on a.user_id = u.user_id
+       JOIN transactions t on t.account_id = a.account_id
+       WHERE account_id = @accountId  ";
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@account_id", accountId);
+
+        using var reader = cmd.ExecuteReader();
+
+        List<Transaction> transactions = new List<Transaction>();
+        while (reader.Read())
+        {
+            Transaction transaction = new Transaction
+            {
+                TransactionId = reader.GetGuid(0),
+                User = reader.IsDBNull(1) ? null : new User
+                {
+                    UserId = reader.GetGuid(1),
+                    Name = reader.GetString(2),
+                    Password = ""
+
+                },
+                Date = reader.GetDateTime(3),
+                TransactionType=reader.GetString(4),
+                Amount = reader.GetDecimal(5)
+
+            };
+            transactions.Add(transaction);
+        }
+        return transactions;
+
     }
 }
 
