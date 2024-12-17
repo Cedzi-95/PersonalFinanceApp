@@ -4,6 +4,7 @@ public class PostgresUserService : IUserService
     private NpgsqlConnection connection;
 
     private Guid? LoggedInuser = null;
+    
 
     public PostgresUserService(NpgsqlConnection connection) 
     {
@@ -95,6 +96,9 @@ public class PostgresUserService : IUserService
 
     private void CreateAccountForUser(Guid userId)
     {
+       
+
+
         var sql = @"INSERT INTO accounts(account_id, user_id, balance) VALUES
         (@account_id, @user_id, 0)";
         using var cmd = new NpgsqlCommand(sql, connection);

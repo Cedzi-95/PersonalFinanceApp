@@ -55,7 +55,7 @@ class Program
 
 
         IUserService userService = new PostgresUserService(connection);
-        IaccountManager accountManager = new PostgresAccount(userService, connection);
+        IaccountManager accountManager = new PostgresAccount(userService, connection, 0);
         ImenuService menuService = new SimpleMenuService();
         Menu initialMenu = new LoginMenu(userService, menuService, accountManager);
 
