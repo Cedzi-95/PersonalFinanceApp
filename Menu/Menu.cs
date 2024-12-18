@@ -12,21 +12,48 @@ public abstract class Menu
 
     public void ExecuteCommand(string inputCommand)
     {
-        string[] commandParts = inputCommand.Split(" ");
-
-        foreach (Command command in commands)
+        if(string.IsNullOrWhiteSpace(inputCommand))
         {
-            if (command.Name.Equals(commandParts[0]))
-            {
-                command.Execute(commandParts);
-                return;
-            }
+            throw new ArgumentException("Command cannot be emply");
         }
+
+        string[] commandParts = inputCommand.Split(" ");
+        string commandName = commandParts[0].ToLower();
+
+        Command? matchningCommand = commands.FirstOrDefault(cmd => 
+        cmd.Name.Equals(commandName, StringComparison.OrdinalIgnoreCase));
+
+
+        if (matchningCommand != null)
+        {
+            matchningCommand.Execute(commandParts);
+            return;
+        }
+        throw new ArgumentException($"command '{commandName}' not found. Type 'help' to see available commands!");
+        // foreach (Command command in commands)
+        // {
+        //     if (command.Name.Equals(commandParts[0]))
+        //     {
+        //         command.Execute(commandParts);
+        //         return;
+        //     }
+        // }
 
         throw new ArgumentException("Command not found.");
 
     }
     public abstract void Display();
+
+    protected void DisplalAvailableCommands()
+    {
+        Console.WriteLine("\n Available commands");
+
+        foreach(var command in commands)
+        {
+            Console.WriteLine($"-{command.Name}");
+        }
+        System.Console.WriteLine();
+    }
 }
 
 

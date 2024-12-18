@@ -6,17 +6,21 @@ public interface ImenuService
 
 public class SimpleMenuService : ImenuService
 {
-    private Menu menu = new EmptyMenu();
+    private Menu?  currentMenu;
 
     public Menu GetMenu()
     {
-        return menu;
+        if (currentMenu == null)
+        {
+            throw new ArgumentException("No current menu is set");
+        }
+        return currentMenu;
     }
 
     public void SetMenu(Menu menu)
     {
-        this.menu = menu;
-        this.menu.Display();
+        currentMenu = menu;
+        currentMenu.Display();
     }
 
 }

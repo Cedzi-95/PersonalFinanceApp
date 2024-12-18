@@ -104,6 +104,8 @@ public class PostgresUserService : IUserService
         using var cmd = new NpgsqlCommand(sql, connection);
         cmd.Parameters.AddWithValue("@account_id", Guid.NewGuid());
         cmd.Parameters.AddWithValue("@user_id", userId);
+        cmd.Parameters.AddWithValue("@balance", 0);
+
 
         cmd.ExecuteNonQuery();
     }

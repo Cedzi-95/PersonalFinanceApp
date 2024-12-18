@@ -1,6 +1,5 @@
 public interface IaccountManager
 {
-    Transaction  CollectTransactionDetails();
 
    
     void CreateTransaction();

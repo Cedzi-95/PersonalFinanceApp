@@ -7,7 +7,7 @@ public class TransactionListCommand : Command
 
     public override void Execute(string[] args)
     {
-        List<Transaction> transactions = accountManager.PrintAllTransactions();
+        List<Transaction> transactions = accountManager.PrintAllTransactions(userService.GetLoggedInUser().UserId);
         foreach (var transaction in transactions)
         {
             if(transaction != null)

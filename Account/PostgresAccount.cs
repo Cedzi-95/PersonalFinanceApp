@@ -1,3 +1,4 @@
+using System.Data;
 using System.Globalization;
 using Npgsql;
 
@@ -17,12 +18,87 @@ public class PostgresAccount : IaccountManager
 
     public void CheckBalance()
     {
-        
-        System.Console.WriteLine($"\n{Colours.GREEN} Current balance:{Colours.GREEN} {balance}");
-        System.Console.WriteLine($"{Colours.NORMAL}");
-        System.Console.WriteLine("\n press key to continiue..");
-        Console.ReadKey();
+        var user = userService.GetLoggedInUser();
+        if (user == null)
+        {
+            throw new ArgumentException("You are not logged in.");
+        }
+
+
+        var accountId = GetAccountIdForUser(user.UserId);
+        if (accountId == null)
+        {
+            throw new Exception($"{Colours.RED}No account found for this user{Colours.NORMAL}");
+        }
+
+        var sql = @"SELECT SUM(CASE 
+        WHEN type = 'd' THEN amount
+        WHEN type = 'w' THEN - amount
+        END
+        ) AS balance
+        FROM transactions 
+        WHERE account_id = @accountId";
+
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@accountId", accountId);
+
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            if (!reader.IsDBNull(0))
+            {
+                decimal balance = reader.GetDecimal(0);
+                Console.WriteLine($"Current balance: {Colours.GREEN}{balance:C}{Colours.NORMAL}");
+            }
+
+            else
+            {
+                Console.WriteLine($"Current balance: {Colours.GREEN}0.00{Colours.NORMAL}");
+            }
+        }
+
+        else
+        {
+            Console.WriteLine($"Current balance: {Colours.GREEN}$0.00{Colours.NORMAL}");
+        }
+
+
+
     }
+
+
+
+
+    public List<Transaction> PrintAllTransactions(Guid UserId)
+    {
+        var sql = @"SELECT  t.type, t.amount, t.date, t.transaction_id
+       FROM users u
+       JOIN accounts a on a.user_id = u.user_id
+       JOIN transactions t on t.account_id = a.account_id
+       WHERE u.user_id = @UserId  ";
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@UserId", UserId);
+
+        using var reader = cmd.ExecuteReader();
+        List<Transaction> transactions = new List<Transaction>();
+        while (reader.Read())
+        {
+            Transaction transaction = new Transaction
+            {
+                TransactionId = reader.GetGuid(3),
+                User = null,
+                Date = reader.GetDateTime(2),
+                TransactionType = reader.GetString(0),
+                Amount = reader.GetDecimal(1)
+
+            };
+            transactions.Add(transaction);
+        }
+        return transactions;
+
+    }
+
 
     public void CreateTransaction()
     {
@@ -171,14 +247,6 @@ public class PostgresAccount : IaccountManager
         cmd.Parameters.AddWithValue("@type", transaction.TransactionType);
 
 
-
-        var accountSql = @"INSERT INTO accounts (account_id, user_id, balance) VALUES (@account_id, @user_id, @balance)";
-        using var accountCmd = new NpgsqlCommand(accountSql, connection);
-        accountCmd.Parameters.AddWithValue("@account_id", accountId);
-         accountCmd.Parameters.AddWithValue("@user_id", userId);
-          accountCmd.Parameters.AddWithValue("@balance", balance += transaction.Amount);
-
-
         cmd.ExecuteNonQuery();
     }
 
@@ -276,54 +344,8 @@ public class PostgresAccount : IaccountManager
 
     }
 
-    Transaction IaccountManager.CollectTransactionDetails()
-    {
-        throw new NotImplementedException();
-    }
 
-    // public void PrintAllTransactions(Transaction transaction, Guid accountId)
-    // {
-    //     var sql = @"SELECT FROM transactions WHERE account_id = @account_id";
-    //     using var cmd = new NpgsqlCommand(sql, connection);
-    //     cmd.Parameters.AddWithValue("@account_id", accountId);
-    // }
 
-    public List<Transaction> PrintAllTransactions(Guid accountId)
-    {
-        
-       var sql = @"SELECT u.username, t.type, t.amount, t.date
-       FROM users u
-       JOIN accounts a on a.user_id = u.user_id
-       JOIN transactions t on t.account_id = a.account_id
-       WHERE account_id = @accountId  ";
-        using var cmd = new NpgsqlCommand(sql, connection);
-        cmd.Parameters.AddWithValue("@account_id", accountId);
-
-        using var reader = cmd.ExecuteReader();
-
-        List<Transaction> transactions = new List<Transaction>();
-        while (reader.Read())
-        {
-            Transaction transaction = new Transaction
-            {
-                TransactionId = reader.GetGuid(0),
-                User = reader.IsDBNull(1) ? null : new User
-                {
-                    UserId = reader.GetGuid(1),
-                    Name = reader.GetString(2),
-                    Password = ""
-
-                },
-                Date = reader.GetDateTime(3),
-                TransactionType=reader.GetString(4),
-                Amount = reader.GetDecimal(5)
-
-            };
-            transactions.Add(transaction);
-        }
-        return transactions;
-
-    }
 }
 
 
