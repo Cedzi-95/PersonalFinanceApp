@@ -32,7 +32,7 @@ class Program
         CREATE TABLE IF NOT EXISTS accounts (
         account_id UUID PRIMARY KEY,
         user_id UUID,
-        balance DECIMAL (15,2),
+        
         CONSTRAINT fk_user
         FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
         );
@@ -55,24 +55,34 @@ class Program
 
 
         IUserService userService = new PostgresUserService(connection);
-        IaccountManager accountManager = new PostgresAccount(userService, connection, 0);
+        IaccountManager accountManager = new PostgresAccount(userService, connection, balance:0);
         ImenuService menuService = new SimpleMenuService();
+
         Menu initialMenu = new LoginMenu(userService, menuService, accountManager);
 
         menuService.SetMenu(initialMenu);
 
         while (true)
         {
-            string? inputCommand = Console.ReadLine()!.ToLower();
+            try
+            {
+                Console.Write("> ");
+                string? input = Console.ReadLine();
 
-            if (inputCommand != null)
-            {
-                menuService.GetMenu().ExecuteCommand(inputCommand);
+                if (string.IsNullOrWhiteSpace(input))
+                    continue;
+
+                if (input.ToLower() == "exit")
+                    break;
+
+                menuService.GetMenu().ExecuteCommand(input.ToLower());
             }
-            else 
+            catch (Exception ex)
             {
-                break;
+                Console.WriteLine($"Error: {ex.Message}");
             }
+        }
+    }
         }
 
 
@@ -80,6 +90,6 @@ class Program
 
     //  Menu.Execute();
      
-    }
+    
 
-}
+
