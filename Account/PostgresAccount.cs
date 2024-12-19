@@ -16,7 +16,7 @@ public class PostgresAccount : IaccountManager
         this.balance = balance;
     }
 
-    public void CheckBalance()
+    public decimal CheckBalance()
     {
         var user = userService.GetLoggedInUser();
         if (user == null)
@@ -44,12 +44,13 @@ public class PostgresAccount : IaccountManager
 
         using var reader = cmd.ExecuteReader();
 
-        if (reader.Read())
+        if (!reader.Read())
         {
             if (!reader.IsDBNull(0))
             {
-                decimal balance = reader.GetDecimal(0);
-                Console.WriteLine($"Current balance: {Colours.GREEN}{balance:C}{Colours.NORMAL}");
+                // decimal balance = reader.GetDecimal(0);
+                //Console.WriteLine($"Current balance: {Colours.GREEN}{balance:C}{Colours.NORMAL}");
+                return 0;
             }
 
             else
@@ -58,10 +59,12 @@ public class PostgresAccount : IaccountManager
             }
         }
 
-        else
-        {
-            Console.WriteLine($"Current balance: {Colours.GREEN}$0.00{Colours.NORMAL}");
-        }
+       
+            // Console.WriteLine($"Current balance: {Colours.GREEN}$0.00{Colours.NORMAL}");
+                            decimal balance = reader.GetDecimal(0);
+
+            return balance;
+        
 
 
 
@@ -118,7 +121,7 @@ public class PostgresAccount : IaccountManager
 
         var transaction = CollectTransactionDetails();
 
-        ProcessTransaction(transaction);
+       // ProcessTransaction(transaction);
         SaveTransactionToDatabase(transaction, accountId.Value, user.UserId);
         DisplayTransactionSummary(transaction);
         transactions.Add(transaction);
@@ -214,27 +217,10 @@ public class PostgresAccount : IaccountManager
     }
 
 
-    private void ProcessTransaction(Transaction transaction)
+    private void SaveTransactionToDatabase(Transaction transaction, Guid accountId, Guid userId)
     {
         if (transaction.TransactionType == "d")
         {
-            balance += transaction.Amount;
-            System.Console.WriteLine($"Deposition amount : {Colours.GREEN}{transaction.Amount}{Colours.NORMAL} | New balance : {Colours.GREEN}{balance}{Colours.NORMAL}");
-        }
-        else if (transaction.TransactionType == "w")
-        {
-            if (transaction.Amount > balance)
-            {
-                throw new ArgumentException($"{Colours.RED}Insufficient funds. Available balance: {balance}{Colours.NORMAL}");
-
-            }
-            balance -= transaction.Amount;
-            System.Console.WriteLine($"Withdrawn amount:{Colours.RED}{transaction.Amount}{Colours.NORMAL} | New balance : {Colours.RED}{balance}{Colours.NORMAL}");
-        }
-    }
-
-    private void SaveTransactionToDatabase(Transaction transaction, Guid accountId, Guid userId)
-    {
         const string sql = @"
         INSERT INTO transactions (transaction_id, account_id, date, amount, type) 
         VALUES (@transaction_id, @account_id, @date, @amount, @type)";
@@ -243,11 +229,33 @@ public class PostgresAccount : IaccountManager
         cmd.Parameters.AddWithValue("@transaction_id", transaction.TransactionId);
         cmd.Parameters.AddWithValue("@account_id", accountId);
         cmd.Parameters.AddWithValue("@date", transaction.Date);
-        cmd.Parameters.AddWithValue("@amount", transaction.Amount);
+        cmd.Parameters.AddWithValue("@amount", balance+=transaction.Amount);
         cmd.Parameters.AddWithValue("@type", transaction.TransactionType);
-
-
         cmd.ExecuteNonQuery();
+        }
+
+        else if (transaction.TransactionType == "w")
+        {
+            if(transaction.Amount < balance)
+            {
+                 const string sql = @"
+        INSERT INTO transactions (transaction_id, account_id, date, amount, type) 
+        VALUES (@transaction_id, @account_id, @date, @amount, @type)";
+
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@transaction_id", transaction.TransactionId);
+        cmd.Parameters.AddWithValue("@account_id", accountId);
+        cmd.Parameters.AddWithValue("@date", transaction.Date);
+        cmd.Parameters.AddWithValue("@amount", balance-=transaction.Amount);
+        cmd.Parameters.AddWithValue("@type", transaction.TransactionType);
+        cmd.ExecuteNonQuery();
+        }
+
+        else
+        {
+            System.Console.WriteLine("Insufficeint funds");
+        }
+        }
     }
 
 
@@ -255,7 +263,7 @@ public class PostgresAccount : IaccountManager
     {
         Console.WriteLine("\nTransaction Summary:");
         Console.WriteLine(transaction.ToString());
-        Console.WriteLine($"Current Balance: {Colours.GREEN}{balance}{Colours.NORMAL}");
+        Console.WriteLine($"New balance: {CheckBalance():c}");
         Console.WriteLine("\nPress any key to continue...");
         Console.ReadKey();
     }

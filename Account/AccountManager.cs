@@ -3,7 +3,7 @@ public interface IaccountManager
 
    
     void CreateTransaction();
-    void CheckBalance();
+    decimal CheckBalance();
     List<Transaction> PrintAllTransactions(Guid accountId);
     void DeleteTransactions();
     void PrintIncome();

@@ -66,7 +66,7 @@ class Program
         {
             try
             {
-                Console.Write("> ");
+                Console.Write($"{Colours.GREEN}> ");
                 string? input = Console.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(input))
