@@ -10,29 +10,6 @@ public class Account
 
 
    
-    public void PrintAllTransactions()
-    {
-        System.Console.WriteLine($"{Colours.GREEN}List of all your transactions {Colours.NORMAL}");
-        System.Console.WriteLine();
-        foreach (Transaction transaction in transactions)
-        {
-
-            System.Console.WriteLine(transaction.ToString());
-            System.Console.WriteLine();
-        }
-
-
-        Console.ReadKey();
-
-    }
-
-
-
-   
-
-
-
-
 
     //SAVING TO FILE
     public void SaveToFile(string filePath)
