@@ -56,18 +56,18 @@ class Program
 
 
         IUserService userService = new PostgresUserService(connection);
-        IaccountManager accountManager = new PostgresAccount(userService, connection, balance:0);
+        IaccountManager accountManager = new PostgresAccount(userService, connection);
         ImenuService menuService = new SimpleMenuService();
 
         Menu initialMenu = new LoginMenu(userService, menuService, accountManager);
-
         menuService.SetMenu(initialMenu);
 
         while (true)
         {
             try
             {
-                Console.Write($"{Colours.GREEN}> ");
+                
+                Console.Write($"{Colours.GREEN}>{Colours.NORMAL} ");
                 string? input = Console.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(input))
@@ -75,6 +75,8 @@ class Program
 
                 if (input.ToLower() == "exit")
                     break;
+
+               
 
                 menuService.GetMenu().ExecuteCommand(input.ToLower());
             }
@@ -89,7 +91,6 @@ class Program
 
 
 
-    //  Menu.Execute();
      
     
 

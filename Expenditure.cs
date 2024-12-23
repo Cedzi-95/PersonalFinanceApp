@@ -1,35 +1,68 @@
 using System.Globalization;
+using Npgsql;
 
 public class Expenditure
 {
+    private NpgsqlConnection connection;
+    private IUserService userService;
 
-    private List<Transaction> transactions = new List<Transaction>();
 
-    public Expenditure(List<Transaction> transactions)
+    public Expenditure(NpgsqlConnection connection, IUserService userService)
     {
-        this.transactions = transactions;
+        this.connection = connection;
+        this.userService = userService;
     }
-   
 
+    private Guid? GetAccountIdForUser(Guid userId)
+    {
+        const string sql = "SELECT account_id From accounts WHERE user_id = @user_id";
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@user_id", userId);
+
+        var result = cmd.ExecuteScalar();
+        return result != null ? (Guid)result : null;
+    }
     public void AnnualSpending()
     {
-        decimal YearlySpending = 0;
+        var user = userService.GetLoggedInUser();
+        var accountId = GetAccountIdForUser(user.UserId);
 
         System.Console.Write("Enter the year: ");
-        int yearInput = int.Parse(Console.ReadLine()!);
-        foreach (Transaction transaction in transactions)
+        int yearInput;
+        if (!int.TryParse(Console.ReadLine()!, out yearInput))
         {
-            if (transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
-            {
-                Console.WriteLine($"> Amount spent:{Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
-                System.Console.WriteLine($"{Colours.NORMAL}");
-                YearlySpending -= transaction.Amount;
-            }
+            System.Console.WriteLine($"{Colours.RED} Invalid year input! {Colours.NORMAL}");
+            return;
         }
 
-        System.Console.WriteLine($"In {yearInput} your total expenditure was {Colours.RED}{YearlySpending * -1}");
-        System.Console.WriteLine($"{Colours.NORMAL}");
-        System.Console.ReadKey();
+        var sql = @" SELECT account_id,
+        SUM(amount) as total_spent
+        FROM transactions
+        WHERE type = 'w'
+        AND EXTRACT(YEAR FROM date) = @year
+        AND account_id = @accountId::uuid
+        GROUP BY account_id
+
+        ";
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@year", yearInput);
+        cmd.Parameters.AddWithValue("@accountId", accountId);
+
+        using var reader = cmd.ExecuteReader();
+
+        if (reader.Read())
+        {
+            System.Console.WriteLine("1");
+            var yearlySpending = reader.GetDecimal(1);
+            System.Console.WriteLine($"Total spending in year {yearInput} : {Colours.RED}{yearlySpending * -1:c}{Colours.NORMAL} ");
+            Console.ReadKey();
+            System.Console.WriteLine();
+
+        }
+
+
+
+
     }
 
 
@@ -53,37 +86,78 @@ public class Expenditure
 
     public void MonthSpend()
     {
-        decimal monthlySpending = 0;
 
-        System.Console.Write("Enter month (1-12): ");
+        Console.Clear();
+
+        var user = userService.GetLoggedInUser();
+        var accountId = GetAccountIdForUser(user.UserId);
+
+
+
+        System.Console.Write("Enter the month (1-12): ");
         int monthInput;
         if (!int.TryParse(Console.ReadLine()!, out monthInput) || monthInput < 1 || monthInput > 12)
         {
-            throw new ArgumentOutOfRangeException("Invalid month input");
+            System.Console.WriteLine("Invalid month input");
+            return;
         }
+
+
+        string monthName = GetMonth(monthInput);
+
+
+
         System.Console.Write("Enter year: ");
-        int yearInput = int.Parse(Console.ReadLine()!);
-
-        string month = GetMonth(monthInput);
-
-        foreach (Transaction transaction in transactions)
+        int InputYear;
+        if (!int.TryParse(Console.ReadLine()!, out InputYear))
         {
+            System.Console.WriteLine("Invalid year input");
+            return;
+        }
 
-            if (transaction.TransactionType == "w" && transaction.Date.Month.Equals(monthInput))
+        var sql = @"SELECT account_id,
+    SUM(amount) as year_total_income
+    FROM transactions
+    WHERE type = 'w'
+    AND EXTRACT(MONTH FROM date) = @month
+    AND EXTRACT(YEAR FROM date) = @year 
+    AND account_id = @accountId::uuid  
+    GROUP BY account_id";
+
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@month", monthInput);
+        cmd.Parameters.AddWithValue("@year", InputYear);
+        cmd.Parameters.AddWithValue("@accountId", accountId);
+
+
+
+        try
+        {
+            using var reader = cmd.ExecuteReader();
+            if (!reader.HasRows)
             {
-                if (transaction.Date.Year.Equals(yearInput))
-                {
-                    Console.WriteLine($"> Amount spent: {Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
-                    System.Console.WriteLine($"{Colours.NORMAL}");
-                    monthlySpending -= transaction.Amount;
-                }
+                Console.WriteLine($"{Colours.RED}No amount was withdrawn in the given period. {Colours.NORMAL}");
+                System.Console.WriteLine();
+                return;
             }
 
+            while (reader.Read())
+            {
+                var totalIncome = reader.GetDecimal(1);
+                Console.WriteLine($"Total spending in {monthName} {InputYear} :{Colours.RED} {totalIncome * -1:c}{Colours.NORMAL}");
+                System.Console.WriteLine();
+                Console.ReadKey();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
         }
 
-        System.Console.WriteLine($"In {month} {yearInput} your total expenditure was {monthlySpending * -1} ");
-        Console.WriteLine();
+
+
         Console.ReadKey();
+
 
     }
 
@@ -95,38 +169,62 @@ public class Expenditure
 
     public void WeeklyExpenditure()
     {
-        decimal weeklySpending = 0;
-
+        var user = userService.GetLoggedInUser();
+        var accountId = GetAccountIdForUser(user.UserId);
         System.Console.Write("Enter week number (1-53): ");
-        int weekNumInput;
-        if (!int.TryParse(Console.ReadLine()!, out weekNumInput) || weekNumInput < 1 || weekNumInput > 53)
+        int weekInput;
+        if (!int.TryParse(Console.ReadLine()!, out weekInput) || weekInput < 1 || weekInput > 52)
         {
-            throw new ArgumentOutOfRangeException("Invalid week input");
+            System.Console.WriteLine("Invalid week input");
+            return;
         }
 
-        System.Console.Write("Enter the year: ");
-        int yearInput = int.Parse(Console.ReadLine()!);
-
-        Calendar calendar = CultureInfo.CurrentCulture.Calendar;
-        CalendarWeekRule weekRule = CalendarWeekRule.FirstDay;
-        DayOfWeek firstDayOfWeek = DayOfWeek.Monday;
-
-        foreach (Transaction transaction in transactions)
+        System.Console.Write("Enter year: ");
+        int yearInput;
+        if (!int.TryParse(Console.ReadLine()!, out yearInput))
         {
-            if (transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
+            System.Console.WriteLine("Invalid year input");
+            return;
+        }
+
+        var sql = @"SELECT account_id,
+    SUM(amount) as year_total_income
+    FROM transactions
+    WHERE type = 'w'
+    AND EXTRACT(WEEK FROM date) = @week
+    AND EXTRACT(YEAR FROM date) = @year
+    AND account_id = @accountId::uuid  
+    GROUP BY account_id";
+
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@week", weekInput);
+        cmd.Parameters.AddWithValue("@year", yearInput);
+        cmd.Parameters.AddWithValue("@accountId", accountId);
+
+
+
+        try
+        {
+            using var reader = cmd.ExecuteReader();
+            if (!reader.HasRows)
             {
-                int WeekOfTheYear = calendar.GetWeekOfYear(transaction.Date, weekRule, firstDayOfWeek);
-                if (WeekOfTheYear == weekNumInput)
-                {
-                    Console.WriteLine($"> Amount spent: {Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
-                    System.Console.WriteLine($"{Colours.NORMAL}");
-                    weeklySpending -= transaction.Amount;
-                }
+                Console.WriteLine($"{Colours.RED}No amount was withdrawn from the given timeline{Colours.NORMAL}");
+                return;
+            }
+
+            while (reader.Read())
+            {
+                var totalIncome = reader.GetDecimal(1);
+                Console.WriteLine($"Total spending in week {weekInput} of {yearInput}:{Colours.RED} {totalIncome * -1:c}{Colours.NORMAL}");
+                System.Console.WriteLine();
+                Console.ReadKey();
             }
         }
-        System.Console.WriteLine($"In week {weekNumInput} of {yearInput} your total expenditure was{Colours.RED} {weeklySpending * -1} ");
-        System.Console.WriteLine($"{Colours.NORMAL}");
-        Console.ReadKey();
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
     }
 
 
@@ -137,48 +235,76 @@ public class Expenditure
     public void DailySpending()
     {
 
-        decimal daySpending = 0;
+        Console.Clear();
 
-        System.Console.Write("Enter day of the week (Monday-Sunday): ");
-        string dayInput = Console.ReadLine()!;
-        if (!Enum.TryParse<DayOfWeek>(dayInput, true, out DayOfWeek dayOfWeek))
+
+        System.Console.Write("Enter day of the week (1-7): ");
+        int dayInput;
+        if (!int.TryParse(Console.ReadLine()!, out dayInput) || dayInput < 0 || dayInput > 7)
         {
             System.Console.WriteLine("Invalid weekday input");
             return;
         }
 
-        System.Console.Write("Enter week of the year (1-53): ");
-        int weekYearInput;
-        if (!int.TryParse(Console.ReadLine()!, out weekYearInput) || weekYearInput < 1 || weekYearInput > 53)
+        var user = userService.GetLoggedInUser();
+        var accountId = GetAccountIdForUser(user.UserId);
+        System.Console.Write("Enter week number (1-53): ");
+        int weekInput;
+        if (!int.TryParse(Console.ReadLine()!, out weekInput) || weekInput < 1 || weekInput > 52)
         {
             System.Console.WriteLine("Invalid week input");
             return;
         }
 
-        Calendar calendar = CultureInfo.CurrentCulture.Calendar;
-        CalendarWeekRule weekRule = CalendarWeekRule.FirstDay;
-        DayOfWeek firstDayOfWeek = DayOfWeek.Monday;
-
-        System.Console.Write("Enter year:");
-        int yearInput = int.Parse(Console.ReadLine()!);
-
-        foreach (Transaction transaction in transactions)
+        System.Console.Write("Enter year: ");
+        int yearInput;
+        if (!int.TryParse(Console.ReadLine()!, out yearInput))
         {
-            if (transaction.TransactionType == "w" && transaction.Date.Year.Equals(yearInput))
+            System.Console.WriteLine($"{Colours.RED}Invalid year input{Colours.NORMAL}");
+            return;
+        }
+
+        var sql = @"SELECT account_id,
+    SUM(amount) as total_income
+    FROM transactions
+    WHERE type = 'w'
+    AND EXTRACT(DOW FROM date) = @weekDay
+    AND EXTRACT(WEEK FROM date) = @week
+    AND EXTRACT(YEAR FROM date) = @year
+    AND account_id = @accountId::uuid  
+    GROUP BY account_id";
+
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@weekDay", dayInput);
+        cmd.Parameters.AddWithValue("@week", weekInput);
+        cmd.Parameters.AddWithValue("@year", yearInput);
+        cmd.Parameters.AddWithValue("@accountId", accountId);
+
+
+
+        try
+        {
+            using var reader = cmd.ExecuteReader();
+            if (!reader.HasRows)
             {
-                int weekYear = calendar.GetWeekOfYear(transaction.Date, weekRule, firstDayOfWeek);
-                if (weekYearInput == weekYear && transaction.Date.DayOfWeek.Equals(dayOfWeek))
-                {
-                    Console.WriteLine($"> Amount spent: {Colours.RED}{transaction.Amount}{Colours.NORMAL} | Date:{Colours.BLUE}{transaction.Date}");
-                    System.Console.WriteLine($"{Colours.NORMAL}");
-                    daySpending -= transaction.Amount;
-                }
+                Console.WriteLine($"{Colours.RED}No amount was withdrawn from the given timeline{Colours.NORMAL}");
+                Console.ReadKey();
+                System.Console.WriteLine();
+                return;
+            }
+
+            while (reader.Read())
+            {
+                var totalIncome = reader.GetDecimal(1);
+                Console.WriteLine($"Total spending made on day {dayInput} of week {weekInput} {yearInput}:{Colours.RED} {totalIncome * -1:c}{Colours.NORMAL}");
+                System.Console.WriteLine();
+                Console.ReadKey();
             }
         }
-        System.Console.WriteLine($"On {dayInput} week {weekYearInput} of {yearInput} your total expenditure was {Colours.RED} {daySpending * -1}");
-        System.Console.WriteLine($"{Colours.NORMAL}");
-        Console.ReadKey();
-
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
 
 
     }
