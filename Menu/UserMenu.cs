@@ -11,6 +11,9 @@ public class UserMenu : Menu
         AddCommand(new DeleteTransactionsCommand(userService, menuService, accountManager));
         AddCommand(new LogoutCommand(userService, menuService, accountManager));
         AddCommand(new CheckBalanceCommand(userService, menuService, accountManager));
+        AddCommand(new IncomeStatsCommand(userService, menuService, accountManager));
+        AddCommand(new SpendingStatsCommand(userService, menuService, accountManager));
+        AddCommand(new HelpCommand(userService, menuService, accountManager));
     }
 
 
@@ -23,6 +26,9 @@ public class UserMenu : Menu
         System.Console.WriteLine($"Type <{Colours.GREEN}Create-transaction{Colours.NORMAL}> for deposition or widrawal ");
         System.Console.WriteLine($"Type <{Colours.GREEN}List-transactions{Colours.NORMAL}> to view all your transactions ");
         System.Console.WriteLine($"Type <{Colours.GREEN}Balance{Colours.NORMAL}> to view your current balance ");
+        System.Console.WriteLine($"Type <{Colours.GREEN}Income-stats{Colours.NORMAL}> to view income statistics");
+        System.Console.WriteLine($"Type <{Colours.GREEN}Spending-stats{Colours.NORMAL}> to view spending statistics");
+        System.Console.WriteLine($"Type <{Colours.GREEN}Delete{Colours.NORMAL}> to remove transactions");
         System.Console.WriteLine($"Type <{Colours.RED}Exit{Colours.NORMAL}> to exit the app ");
     }
 }

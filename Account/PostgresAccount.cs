@@ -6,14 +6,13 @@ public class PostgresAccount : IaccountManager
 {
     private IUserService userService;
     private NpgsqlConnection connection;
-  //  public decimal balance { get; set; }
     private List<Transaction> transactions = new List<Transaction>();
+    private UserMenu userMenu;
 
-    public PostgresAccount(IUserService userService, NpgsqlConnection connection, decimal balance)
+    public PostgresAccount(IUserService userService, NpgsqlConnection connection)
     {
         this.userService = userService;
         this.connection = connection;
-       // this.balance = balance;
     }
 
     public decimal CheckBalance()
@@ -257,20 +256,75 @@ if (rowsAffected == 0)
     private void DisplayTransactionSummary(Transaction transaction)
     {
         Console.WriteLine("\nTransaction Summary:");
+        System.Console.WriteLine($"{Colours.ORANGE}");
         Console.WriteLine(transaction.ToString());
-        Console.WriteLine($"New balance:{Colours.GREEN} {CheckBalance():c}");
+        Console.WriteLine($"> New balance:{Colours.GREEN} {CheckBalance():c}");
         Console.WriteLine($"{Colours.NORMAL}");
     }
 
-    public void DeleteTransactions()
+    public async Task DeleteTransactions()
     {
-        throw new NotImplementedException();
+        try
+        {
+ var user = userService.GetLoggedInUser();
+     var accountId = GetAccountIdForUser(user.UserId);
+
+
+     System.Console.WriteLine("Delete [all] or [single] transactions");
+      string input = Console.ReadLine()!.ToLower();
+
+      
+
+      if(input == "all")
+      {
+        var sql = @"DELETE FROM transactions WHERE account_id = @accountId::uuid
+        ";
+
+        using var cmd = new NpgsqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@accountId", accountId);
+
+        var rowsAffected = await cmd.ExecuteNonQueryAsync();
+        System.Console.WriteLine($"{rowsAffected} transactions were deleted");
+
+      }
+
+      else if (input == "single")
+      {
+         DateTime date = GetTransactionDate();
+
+         var sql = @"DELETE FROM transactions WHERE date = @date
+         AND account_id = @accountId";
+
+         using var cmd = new NpgsqlCommand(sql, connection);
+         cmd.Parameters.AddWithValue("@date", date);
+         cmd.Parameters.AddWithValue("@accountId", accountId);
+
+         var rowsAffected = await cmd.ExecuteNonQueryAsync();
+         System.Console.WriteLine($"{rowsAffected} transaction(s) were deleted");
+
+      }
+
+      else
+      {
+        Console.WriteLine("Invalid input. Please enter 'all' or 'single'.");
+      }
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"Error deleting transactions: {ex.Message}");
+            throw;
+        }
+    
+
+
     }
 
 
     public void PrintExpenditures()
     {
-        Expenditure expenditure = new Expenditure(transactions); //new instance of expediture object
+       
+
+        Expenditure expenditure = new Expenditure(connection, userService);
 
         try
         {
@@ -294,7 +348,8 @@ if (rowsAffected == 0)
                         expenditure.DailySpending();
                         break;
                     case "exit":
-                        Console.WriteLine("back to the meny...");
+                        Console.WriteLine("back to the main menu...");                        
+                        
                         return;
 
                 }
@@ -308,7 +363,8 @@ if (rowsAffected == 0)
 
     public void PrintIncome()
     {
-        Income income = new Income(transactions); //new instance of an income object
+        
+        Income income = new Income( connection, userService); 
         try
         {
             while (true)
@@ -322,18 +378,21 @@ if (rowsAffected == 0)
                         income.YearIncome();
                         break;
                     case "month":
-                        income.MonthlyIncome();
+                         income.MonthlyIncome();
                         break;
                     case "week":
-                        income.WeekIncome();
+                         income.WeekIncome();
                         break;
                     case "day":
-                        income.DailyIncome();
+                         income.DailyIncome();
                         break;
 
                     case "exit":
-                        System.Console.WriteLine("Back to the main menu.");
-                        return;
+                        
+                        System.Console.WriteLine("Back to the menu");
+                        
+                        break;
+                        
                 }
 
             }
@@ -355,32 +414,3 @@ if (rowsAffected == 0)
 
 
 
-// public void Deposition(decimal amount)
-// {
-//     Console.Clear();
-//     balance += amount;
-//     System.Console.WriteLine($" Deposition amount: {Colours.GREEN} {amount} {Colours.NORMAL} \n New balance:{Colours.GREEN} {balance} {Colours.NORMAL}");
-//     System.Console.WriteLine("\n Press key to continue...");
-//     Console.ReadKey();
-// }
-
-
-
-// public void Withdraw(decimal amount)
-// {
-//     Console.Clear();
-//     if (amount <= balance)
-//     {
-
-//         balance -= amount;
-//         System.Console.WriteLine($"> Amount retreived:{Colours.RED} {amount} {Colours.NORMAL} \n{Colours.GREEN}New balance: {balance}");
-//         System.Console.WriteLine($"{Colours.NORMAL}");
-//         System.Console.WriteLine("\n Press key to continue...");
-//         Console.ReadKey();
-
-//     }
-//     else
-//     {
-//         System.Console.WriteLine($"{Colours.RED}Insufficient funds {Colours.NORMAL}");
-//         Console.ReadKey();
-//     }

@@ -1,5 +1,6 @@
 public class HelpCommand : Command
 {
+    UserMenu userMenu;
     public HelpCommand(IUserService userService, ImenuService menuService, IaccountManager accountManager) :
     base ("help", userService, menuService, accountManager)
     {
@@ -8,6 +9,6 @@ public class HelpCommand : Command
 
     public override void Execute(string[] args)
     {
-       System.Console.WriteLine("");
+       userMenu.Display();
     }
 } 
