@@ -391,7 +391,7 @@ if (rowsAffected == 0)
                         
                         System.Console.WriteLine("Back to the menu");
                         
-                        break;
+                        return;
                         
                 }
 
