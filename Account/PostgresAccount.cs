@@ -209,7 +209,7 @@ public class PostgresAccount : IaccountManager
 
         else if (transaction.TransactionType == "w")
         {
-const string sql = @"
+            const string sql = @"
 WITH locked_rows AS (
     SELECT amount
     FROM transactions 
@@ -235,18 +235,18 @@ SELECT
     @type
 WHERE (SELECT total_amount FROM balance) >= @amount;";
 
-using var cmd = new NpgsqlCommand(sql, connection);
-cmd.Parameters.AddWithValue("@transaction_id", transaction.TransactionId);
-cmd.Parameters.AddWithValue("@account_id", accountId);
-cmd.Parameters.AddWithValue("@date", transaction.Date);
-cmd.Parameters.AddWithValue("@amount", transaction.Amount);
-cmd.Parameters.AddWithValue("@type", transaction.TransactionType);
+            using var cmd = new NpgsqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@transaction_id", transaction.TransactionId);
+            cmd.Parameters.AddWithValue("@account_id", accountId);
+            cmd.Parameters.AddWithValue("@date", transaction.Date);
+            cmd.Parameters.AddWithValue("@amount", transaction.Amount);
+            cmd.Parameters.AddWithValue("@type", transaction.TransactionType);
 
-int rowsAffected = cmd.ExecuteNonQuery();
-if (rowsAffected == 0)
-{
-    throw new Exception($"{Colours.RED}Insufficient funds{Colours.NORMAL}");
-}
+            int rowsAffected = cmd.ExecuteNonQuery();
+            if (rowsAffected == 0)
+            {
+                throw new Exception($"{Colours.RED}Insufficient funds{Colours.NORMAL}");
+            }
 
 
         }
@@ -266,55 +266,61 @@ if (rowsAffected == 0)
     {
         try
         {
- var user = userService.GetLoggedInUser();
-     var accountId = GetAccountIdForUser(user.UserId);
+            var user = userService.GetLoggedInUser();
+            var accountId = GetAccountIdForUser(user.UserId);
 
 
-     System.Console.WriteLine("Delete [all] or [single] transactions");
-      string input = Console.ReadLine()!.ToLower();
+            // System.Console.WriteLine("Delete [all] or [single] transactions");
+            // string input = Console.ReadLine()!.ToLower();
 
-      
+            while (true)
+            {
+                 System.Console.WriteLine("Delete [all] or [single] transactions");
+            string input = Console.ReadLine()!.ToLower();
 
-      if(input == "all")
-      {
-        var sql = @"DELETE FROM transactions WHERE account_id = @accountId::uuid
+                if (input == "all")
+                {
+                    var sql = @"DELETE FROM transactions WHERE account_id = @accountId::uuid
         ";
 
-        using var cmd = new NpgsqlCommand(sql, connection);
-        cmd.Parameters.AddWithValue("@accountId", accountId);
+                    using var cmd = new NpgsqlCommand(sql, connection);
+                    cmd.Parameters.AddWithValue("@accountId", accountId);
 
-        var rowsAffected = await cmd.ExecuteNonQueryAsync();
-        System.Console.WriteLine($"{rowsAffected} transactions were deleted");
+                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
+                    System.Console.WriteLine($"{rowsAffected} transactions were deleted");
+                    System.Console.WriteLine("\ntype help to go back to the main menu...");
+                    return;
 
-      }
+                }
 
-      else if (input == "single")
-      {
-         DateTime date = GetTransactionDate();
+                else if (input == "single")
+                {
+                    DateTime date = GetTransactionDate();
 
-         var sql = @"DELETE FROM transactions WHERE date = @date
+                    var sql = @"DELETE FROM transactions WHERE date = @date
          AND account_id = @accountId";
 
-         using var cmd = new NpgsqlCommand(sql, connection);
-         cmd.Parameters.AddWithValue("@date", date);
-         cmd.Parameters.AddWithValue("@accountId", accountId);
+                    using var cmd = new NpgsqlCommand(sql, connection);
+                    cmd.Parameters.AddWithValue("@date", date);
+                    cmd.Parameters.AddWithValue("@accountId", accountId);
 
-         var rowsAffected = await cmd.ExecuteNonQueryAsync();
-         System.Console.WriteLine($"{rowsAffected} transaction(s) were deleted");
-
-      }
-
-      else
-      {
-        Console.WriteLine("Invalid input. Please enter 'all' or 'single'.");
-      }
+                    var rowsAffected = await cmd.ExecuteNonQueryAsync();
+                    System.Console.WriteLine($"{rowsAffected} transaction(s) were deleted");
+                    System.Console.WriteLine("\n type help to go back to the main menu...");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter 'all' or 'single'.");
+                }
+            }
         }
         catch (Exception ex)
         {
             System.Console.WriteLine($"Error deleting transactions: {ex.Message}");
             throw;
         }
-    
+
 
 
     }
@@ -322,7 +328,7 @@ if (rowsAffected == 0)
 
     public void PrintExpenditures()
     {
-       
+
 
         Expenditure expenditure = new Expenditure(connection, userService);
 
@@ -348,8 +354,8 @@ if (rowsAffected == 0)
                         expenditure.DailySpending();
                         break;
                     case "exit":
-                        Console.WriteLine("back to the main menu...");                        
-                        
+                        Console.WriteLine("back to the main menu...");
+
                         return;
 
                 }
@@ -363,8 +369,8 @@ if (rowsAffected == 0)
 
     public void PrintIncome()
     {
-        
-        Income income = new Income( connection, userService); 
+
+        Income income = new Income(connection, userService);
         try
         {
             while (true)
@@ -378,21 +384,21 @@ if (rowsAffected == 0)
                         income.YearIncome();
                         break;
                     case "month":
-                         income.MonthlyIncome();
+                        income.MonthlyIncome();
                         break;
                     case "week":
-                         income.WeekIncome();
+                        income.WeekIncome();
                         break;
                     case "day":
-                         income.DailyIncome();
+                        income.DailyIncome();
                         break;
 
                     case "exit":
-                        
-                        System.Console.WriteLine("Back to the menu");
-                        
+
+                        System.Console.WriteLine("Type help to get back to the main menu");
+
                         return;
-                        
+
                 }
 
             }

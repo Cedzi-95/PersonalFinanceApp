@@ -19,6 +19,6 @@ public class UserMenu : Menu
 
     public override void Display()
     {
-        System.Console.WriteLine($"Type help to view all the commands");
+        System.Console.WriteLine($"Type 'help' to view all the commands");
     }
 }
