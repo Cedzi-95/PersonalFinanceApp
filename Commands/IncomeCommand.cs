@@ -7,6 +7,7 @@ public class IncomeCommand : Command
     }
     public override void Execute(string[] args)
     {
+        Console.Clear();
         accountManager.PrintIncome();
     }
 }

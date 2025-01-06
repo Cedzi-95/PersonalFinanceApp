@@ -3,7 +3,7 @@ public class TransactionListCommand : Command
     
     
     public TransactionListCommand(IUserService userService, ImenuService menuService, IaccountManager accountManager) :
-    base ("list-transactions", userService, menuService, accountManager) {}
+    base ("list", userService, menuService, accountManager) {}
 
     public override void Execute(string[] args)
     {

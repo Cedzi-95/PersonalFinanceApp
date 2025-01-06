@@ -1,7 +1,7 @@
 public class RegisterUserCommand : Command
 {
     public RegisterUserCommand (IUserService userService, ImenuService menuService, IaccountManager accountManager) :
-    base ("register-user", userService, menuService, accountManager) {}
+    base ("register", userService, menuService, accountManager) {}
 public override void Execute(string[] args)
     {
        string username = args[1];
@@ -9,6 +9,6 @@ public override void Execute(string[] args)
 
        User user = userService.RegisterUser(username, password);
 
-       System.Console.WriteLine($"Created user '{user.Name}");
+       System.Console.WriteLine($"Created user '{user.Name}'");
     }
 }

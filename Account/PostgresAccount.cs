@@ -7,7 +7,7 @@ public class PostgresAccount : IaccountManager
     private IUserService userService;
     private NpgsqlConnection connection;
     private List<Transaction> transactions = new List<Transaction>();
-    private UserMenu userMenu;
+   
 
     public PostgresAccount(IUserService userService, NpgsqlConnection connection)
     {
