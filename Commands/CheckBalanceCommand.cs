@@ -8,8 +8,11 @@ public class CheckBalanceCommand : Command
 
     public override void Execute(string[] args)
     {
-        //accountManager.CheckBalance();
+        Console.Clear();
         System.Console.WriteLine($"Current balance: {accountManager.CheckBalance():c}");
+         Console.WriteLine();
+        menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
+
     }
 }
 

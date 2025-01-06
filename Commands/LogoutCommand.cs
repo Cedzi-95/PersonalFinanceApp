@@ -5,6 +5,7 @@ public class LogoutCommand : Command
 
     public override void Execute(string[] args)
     {
-        userService.Logout();
+       System.Console.WriteLine(userService.Logout());
+       menuService.SetMenu(new LoginMenu(userService, menuService, accountManager));
     }
 }

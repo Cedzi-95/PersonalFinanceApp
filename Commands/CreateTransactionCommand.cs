@@ -12,6 +12,7 @@ public class CreateTransactionCommand : Command
 
     public override void Execute(string[] args)
     {
+        Console.Clear();
         accountManager.CreateTransaction();
         System.Console.WriteLine("Your transaction has gone through.");
     }

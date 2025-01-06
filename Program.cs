@@ -24,7 +24,7 @@ class Program
         
         CREATE TABLE IF NOT EXISTS users (
         user_id UUID PRIMARY KEY,
-        username TEXT,
+        username TEXT UNIQUE,
         password TEXT
         );
 
@@ -67,7 +67,7 @@ class Program
             try
             {
                 
-                Console.Write($"{Colours.GREEN}>{Colours.NORMAL} ");
+                Console.Write($"{Colours.GREEN}\n>{Colours.NORMAL} ");
                 string? input = Console.ReadLine();
 
                 if (string.IsNullOrWhiteSpace(input))

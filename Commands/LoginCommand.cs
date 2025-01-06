@@ -15,7 +15,9 @@ public class LoginCommand : Command
             System.Console.WriteLine("Wrong username or password.");
             return;
         }
-        System.Console.WriteLine("You have successfully logged in");
+        Console.Clear();
+        System.Console.WriteLine($"{Colours.GREEN}You have successfully logged in!{Colours.NORMAL}");
+        Console.WriteLine();
         menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
     }
 
