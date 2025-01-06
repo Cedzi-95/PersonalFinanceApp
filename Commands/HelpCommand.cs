@@ -1,14 +1,14 @@
 public class HelpCommand : Command
 {
-    public HelpCommand(IUserService userService, ImenuService menuService, IaccountManager accountManager) :
-base("help", userService, menuService, accountManager)
+        public HelpCommand(IUserService userService, ImenuService menuService, IaccountManager accountManager) :
+    base ("help", userService, menuService, accountManager)
     {
-
+        
     }
 
     public override void Execute(string[] args)
     {
-        Console.Clear();
+       Console.Clear();
         System.Console.WriteLine($"{Colours.NORMAL}");
         System.Console.WriteLine("Type 'help' for a list of commands");
         System.Console.WriteLine();
@@ -20,4 +20,4 @@ base("help", userService, menuService, accountManager)
         System.Console.WriteLine($"\n{Colours.GREEN}[Delete]{Colours.NORMAL} to remove transactions");
         System.Console.WriteLine($"\n{Colours.RED}[Logout]{Colours.NORMAL} to exit the app ");
     }
-}
+} 

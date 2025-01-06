@@ -128,8 +128,6 @@ public class PostgresUserService : IUserService
 
        cmd.ExecuteNonQuery();
        CreateAccountForUser(user.UserId);
-       //debug by printing password
-       Console.WriteLine($"About to store password: {password}");
        
        return user;
     }

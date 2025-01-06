@@ -10,5 +10,9 @@ public class ExpenditureCommand : Command
     {
         Console.Clear();
         accountManager.PrintExpenditures();
+        Console.WriteLine("\npress key to continue..");
+        Console.ReadKey();
+        menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
+
     }
 }

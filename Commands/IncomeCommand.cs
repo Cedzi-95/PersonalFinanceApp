@@ -9,5 +9,9 @@ public class IncomeCommand : Command
     {
         Console.Clear();
         accountManager.PrintIncome();
+        Console.WriteLine("\npress key to continue..");
+        Console.ReadKey();
+        menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
+
     }
 }

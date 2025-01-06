@@ -9,6 +9,10 @@ public override void Execute(string[] args)
 
        User user = userService.RegisterUser(username, password);
 
-       System.Console.WriteLine($"Created user '{user.Name}'");
+       System.Console.WriteLine($"Created user {Colours.GREEN}'{user.Name}{Colours.NORMAL}'");
+       Console.WriteLine("\npress key to continue...");
+        Console.ReadKey();
+        menuService.SetMenu(new LoginMenu(userService, menuService, accountManager));
+
     }
 }
