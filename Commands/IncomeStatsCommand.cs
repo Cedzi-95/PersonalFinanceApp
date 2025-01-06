@@ -7,5 +7,9 @@ public class IncomeStatsCommand : Command
     public override void Execute(string[] args)
     {
         accountManager.PrintIncome();
+        Console.WriteLine("\npress key to continue..");
+        Console.ReadKey();
+        menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
+
     }
 }

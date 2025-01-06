@@ -7,5 +7,9 @@ public class DeleteTransactionsCommand : Command
     {
         Console.Clear();
         accountManager.DeleteTransactions();
+        Console.WriteLine("\npress key to continue..");
+        Console.ReadKey();
+        menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
+
     }
 }

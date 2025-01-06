@@ -15,6 +15,11 @@ public class CreateTransactionCommand : Command
         Console.Clear();
         accountManager.CreateTransaction();
         System.Console.WriteLine("Your transaction has gone through.");
+        Console.WriteLine("\npress key to continue..");
+        Console.ReadKey();
+        menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
+
+        
     }
 
 

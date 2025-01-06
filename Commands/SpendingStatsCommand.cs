@@ -9,5 +9,9 @@ public class SpendingStatsCommand : Command
     public override void Execute(string[] args)
     {
        accountManager.PrintExpenditures();
+       Console.WriteLine("\npress key to continue..");
+        Console.ReadKey();
+        menuService.SetMenu(new UserMenu(userService, menuService, accountManager));
+
     }
 }
