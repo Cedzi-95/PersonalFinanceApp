@@ -4,13 +4,6 @@ using System;
 using Npgsql;
 class Program
 
-// - Registrera användare genom namn och lösenord
-
-// - Logga in genom namn och lösenord
-
-// - Logga ut (och kunna byta användare genom att logga in igen)
-
-// - All funktionalitet från tidigare uppgift, kopplat per-användare
 
 
 {
