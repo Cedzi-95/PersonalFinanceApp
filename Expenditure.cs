@@ -68,8 +68,6 @@ public class Expenditure
 
 
 
-
-
     private string GetMonth(int month)
     {
         if (month < 1 || month > 12)
@@ -163,10 +161,6 @@ public class Expenditure
 
 
 
-
-
-
-
     public void WeeklyExpenditure()
     {
         var user = userService.GetLoggedInUser();
@@ -228,10 +222,6 @@ public class Expenditure
     }
 
 
-
-
-
-
     public void DailySpending()
     {
 
@@ -244,6 +234,10 @@ public class Expenditure
         {
             System.Console.WriteLine("Invalid weekday input");
             return;
+        }
+        if (dayInput == 7)
+        {
+            dayInput -= 7;
         }
 
         var user = userService.GetLoggedInUser();
